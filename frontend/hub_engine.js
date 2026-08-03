@@ -1,0 +1,3 @@
+const api='/api/v1';const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+async function products(q=''){let r=await fetch(`${api}/products?status=active&search=${encodeURIComponent(q)}`);return r.ok?r.json():[]}
+function card(p){return `<a class="glass rounded-xl overflow-hidden block" href="product.html?id=${p.id}"><img class="w-full h-40 object-cover" src="${p.images[0]||'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=600'}" alt=""><div class="p-4"><b>${esc(p.name)}</b><p class="text-slate-400">${esc(p.product_type)}</p><strong>${p.currency} ${p.base_price}</strong></div></a>`}
