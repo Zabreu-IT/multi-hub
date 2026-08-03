@@ -15,4 +15,5 @@ for route in (products,categories,connectors,orders,dashboard,media): app.includ
 @app.get("/health")
 def health(): return {"ok":True}
 app.mount("/dashboard",StaticFiles(directory=Path("/app/dashboard"),html=True),name="dashboard")
+app.mount("/apps/frontend",StaticFiles(directory=Path("/app/apps/frontend"),html=True),name="how-it-works")
 app.mount("/",StaticFiles(directory=Path("/app/frontend"),html=True),name="frontend")
