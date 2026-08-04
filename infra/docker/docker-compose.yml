@@ -20,6 +20,12 @@ services:
     environment:
       DATABASE_URL: "postgresql+psycopg://hub:${POSTGRES_PASSWORD:-hub}@db:5432/multihub"
       CELERY_BROKER_URL: redis://redis:6379/0
+      OPENROUTER_API_KEY: "${OPENROUTER_API_KEY:-}"
+      OPENROUTER_MODEL: "${OPENROUTER_MODEL:-nvidia/nemotron-3-super-120b-a12b:free}"
+      SMTP_HOST: "${SMTP_HOST:-smtp.zoho.com}"
+      SMTP_PORT: "${SMTP_PORT:-465}"
+      SMTP_USER: "${SMTP_USER:-info@ingeniartecr.com}"
+      SMTP_PASS: "${SMTP_PASS:-}"
     depends_on: [db, redis]
   nginx:
     image: nginx:alpine

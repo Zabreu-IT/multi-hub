@@ -125,5 +125,6 @@ class Lead(Base):
     business_type: Mapped[str] = mapped_column(String(32))
     message: Mapped[str | None] = mapped_column(Text)
     status: Mapped[str] = mapped_column(String(16), default="new")
+    metadata_: Mapped[dict] = mapped_column("metadata", JSONB, default=dict)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())

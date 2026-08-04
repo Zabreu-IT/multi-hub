@@ -1,4 +1,5 @@
 from datetime import datetime
+import logging
 from uuid import UUID
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel, ConfigDict, Field
@@ -8,6 +9,7 @@ from core.database import get_db
 from core.models import Lead
 
 router = APIRouter(prefix="/leads", tags=["leads"])
+logger = logging.getLogger(__name__)
 
 
 class LeadIn(BaseModel):
@@ -34,6 +36,11 @@ class LeadOut(LeadIn, LeadCreated):
 def create(data: LeadIn, db: Session = Depends(get_db)):
     lead = Lead(**data.model_dump())
     db.add(lead); db.commit(); db.refresh(lead)
+    try:
+        from worker.tasks import send_welcome_email
+        send_welcome_email.delay(str(lead.id))
+    except Exception:
+        logger.exception("Could not enqueue welcome email for lead %s", lead.id)
     return lead
 
 

@@ -2,13 +2,16 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
+from sqlalchemy import text
 from core.database import engine
 from core.models import Base
 from api.middleware import request_context
 from api.routes import products,categories,availability,connectors,orders,dashboard,media,leads
 @asynccontextmanager
 async def lifespan(app):
- Base.metadata.create_all(engine); yield
+ Base.metadata.create_all(engine)
+ with engine.begin() as connection: connection.execute(text("ALTER TABLE leads ADD COLUMN IF NOT EXISTS metadata JSONB NOT NULL DEFAULT '{}'::jsonb"))
+ yield
 app=FastAPI(title="Multi-Hub API",version="1.0.0",lifespan=lifespan)
 app.middleware("http")(request_context)
 for route in (products,categories,connectors,orders,dashboard,media,leads): app.include_router(route.router,prefix="/api/v1")
