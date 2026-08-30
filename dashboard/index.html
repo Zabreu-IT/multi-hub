@@ -42,6 +42,7 @@
       <a class="side-link" href="connectors.html"><svg class="icon"><use href="#i-plug"/></svg> Conectores</a>
       <p class="nav-sec">Sitio</p>
       <a class="side-link" href="/" target="_blank"><svg class="icon"><use href="#i-external"/></svg> Ver sitio público</a>
+    <div id="user-chip" style="margin-top:1rem"></div>
     </nav>
   </aside>
 
@@ -87,8 +88,10 @@
 </div>
 <div id="toasts" aria-live="polite"></div>
 
+<script src="auth.js"></script>
 <script>
 'use strict';
+if (!requireAuth()) {}
 const API = '/api/v1';
 const fmtUSD = (n, c = 'USD') => `${c} ${Number(n).toLocaleString('es', { maximumFractionDigits: 2 })}`;
 const fmtDate = (s) => s ? new Date(s).toLocaleDateString('es', { day: '2-digit', month: 'short' }) : '—';
@@ -105,7 +108,7 @@ function toast(msg, type = 'ok') {
 const statusCls = (s) => ({ active: 'st-active', draft: 'st-draft', pending: 'st-pending', confirmed: 'st-confirmed', cancelled: 'st-cancelled', completed: 'st-completed', unpaid: 'st-unpaid', paid: 'st-paid', refunded: 'st-refunded', new: 'st-new', disabled: 'st-disabled', error: 'st-error' }[s] || 'st-draft');
 
 async function get(path, opts) {
-  const r = await fetch(API + path, opts);
+  const r = await authFetch(API + path, opts);
   if (!r.ok) { let d = {}; try { d = await r.json(); } catch (e) {} throw new Error(d.detail || 'Error ' + r.status); }
   return r.json();
 }
@@ -179,6 +182,7 @@ async function load() {
 }
 function reload() { load(); }
 load();
+renderUser();
 </script>
 </body>
 </html>

@@ -37,13 +37,14 @@
       <a class="side-link active" href="connectors.html"><svg class="icon"><use href="#i-plug"/></svg> Conectores</a>
       <p class="nav-sec">Sitio</p>
       <a class="side-link" href="/" target="_blank"><svg class="icon"><use href="#i-external"/></svg> Ver sitio público</a>
+    <div id="user-chip" style="margin-top:1rem"></div>
     </nav>
   </aside>
 
   <main class="main">
     <div class="topbar">
       <h1>Conectores</h1>
-      <div class="topbar-actions"><button class="btn btn-primary" onclick="openModal()"><svg class="icon"><use href="#i-plus"/></svg> Nuevo conector</button></div>
+      <div class="topbar-actions"><button class="btn btn-primary" id="btn-new" onclick="openModal()"><svg class="icon"><use href="#i-plus"/></svg> Nuevo conector</button></div>
     </div>
     <p class="muted" style="margin-bottom:1.2rem">Sincroniza tu catálogo con tiendas externas (Shopify, WooCommerce, PrestaShop).</p>
     <div id="list" class="grid grid-2"><div class="card"><div class="empty">Cargando…</div></div></div>
@@ -70,15 +71,17 @@
 </div>
 <div id="toasts" aria-live="polite"></div>
 
+<script src="auth.js"></script>
 <script>
 'use strict';
+if (!requireAuth()) {}
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
 const PLATFORM_ICO = { native: '🛠', shopify: '🛍', woocommerce: '🛒', prestashop: '🏷' };
 const statusCls = (s) => ({ active: 'st-active', disabled: 'st-disabled', error: 'st-error' }[s] || 'st-draft');
 const fmtDate = (s) => s ? new Date(s).toLocaleString('es', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) : 'Nunca';
 function toast(msg, type) { const el = document.createElement('div'); el.className = 'toast' + (type ? ' ' + type : ''); el.textContent = msg; document.getElementById('toasts').appendChild(el); setTimeout(() => el.remove(), 3500); }
-async function get(path, opts) { const r = await fetch('/api/v1' + path, opts); if (!r.ok) { let d = {}; try { d = await r.json(); } catch (e) {} throw new Error(d.detail || 'Error ' + r.status); } return r.json(); }
-async function api(path, method, body) { const r = await fetch('/api/v1' + path, { method, headers: { 'Content-Type': 'application/json' }, body: body ? JSON.stringify(body) : undefined }); if (!r.ok) { let d = {}; try { d = await r.json(); } catch (e) {} throw new Error(d.detail || 'Error ' + r.status); } return r.json().catch(() => ({})); }
+async function get(path, opts) { const r = await authFetch('/api/v1' + path, opts); if (!r.ok) { let d = {}; try { d = await r.json(); } catch (e) {} throw new Error(d.detail || 'Error ' + r.status); } return r.json(); }
+async function api(path, method, body) { const r = await authFetch('/api/v1' + path, { method, headers: { 'Content-Type': 'application/json' }, body: body ? JSON.stringify(body) : undefined }); if (!r.ok) { let d = {}; try { d = await r.json(); } catch (e) {} throw new Error(d.detail || 'Error ' + r.status); } return r.json().catch(() => ({})); }
 
 async function load() {
   try {
@@ -97,6 +100,10 @@ async function load() {
           </div>
         </div>`).join('')
       : '<div class="card"><div class="empty"><svg class="icon"><use href="#i-plug"/></svg>No hay conectores configurados</div></div>';
+    if (isReadOnly()) {
+      const bn = document.getElementById('btn-new'); if (bn) bn.classList.add('hide');
+      document.querySelectorAll('.card .flex .btn').forEach(el => el.classList.add('hide'));
+    }
   } catch (e) { document.getElementById('list').innerHTML = `<div class="card"><div class="empty">${esc(e.message)}</div></div>`; }
 }
 
@@ -134,6 +141,7 @@ document.getElementById('cform').addEventListener('submit', async (e) => {
   } catch (err) { toast(err.message, 'error'); }
 });
 load();
+renderUser();
 </script>
 </body>
 </html>

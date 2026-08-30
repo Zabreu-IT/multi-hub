@@ -39,6 +39,7 @@
       <a class="side-link" href="connectors.html"><svg class="icon"><use href="#i-plug"/></svg> Conectores</a>
       <p class="nav-sec">Sitio</p>
       <a class="side-link" href="/" target="_blank"><svg class="icon"><use href="#i-external"/></svg> Ver sitio público</a>
+    <div id="user-chip" style="margin-top:1rem"></div>
     </nav>
   </aside>
 
@@ -46,7 +47,7 @@
     <div class="topbar">
       <h1>Productos</h1>
       <div class="topbar-actions">
-        <button class="btn btn-primary" onclick="openModal('new')"><svg class="icon"><use href="#i-plus"/></svg> Nuevo producto</button>
+        <button class="btn btn-primary" id="btn-new" onclick="openModal('new')"><svg class="icon"><use href="#i-plus"/></svg> Nuevo producto</button>
       </div>
     </div>
 
@@ -99,8 +100,10 @@
 </div>
 <div id="toasts" aria-live="polite"></div>
 
+<script src="auth.js"></script>
 <script>
 'use strict';
+if (!requireAuth()) {}
 const API = '/api/v1';
 let products = [], cats = [], editingId = null;
 
@@ -113,12 +116,12 @@ const fmtUSD = (n, c) => `${c} ${Number(n).toLocaleString('es', { maximumFractio
 function toast(msg, type) { const el = document.createElement('div'); el.className = 'toast' + (type ? ' ' + type : ''); el.textContent = msg; document.getElementById('toasts').appendChild(el); setTimeout(() => el.remove(), 3500); }
 
 async function get(path, opts) {
-  const r = await fetch(API + path, opts);
+  const r = await authFetch(API + path, opts);
   if (!r.ok) { let d = {}; try { d = await r.json(); } catch (e) {} throw new Error(d.detail || 'Error ' + r.status); }
   return r.json();
 }
 async function api(path, method, body) {
-  const r = await fetch(API + path, { method, headers: { 'Content-Type': 'application/json' }, body: body ? JSON.stringify(body) : undefined });
+  const r = await authFetch(API + path, { method, headers: { 'Content-Type': 'application/json' }, body: body ? JSON.stringify(body) : undefined });
   if (!r.ok) { let d = {}; try { d = await r.json(); } catch (e) {} throw new Error(d.detail || 'Error ' + r.status); }
   return r.json().catch(() => ({}));
 }
@@ -160,6 +163,7 @@ async function load() {
     products = await get('/products?' + params.toString());
     if (!cats.length) cats = await get('/categories');
     const catName = (id) => (cats.find((c) => c.id === id) || {}).name || '—';
+    if (isReadOnly()) { const bn = document.getElementById('btn-new'); if (bn) bn.classList.add('hide'); }
     document.getElementById('list').innerHTML = products.length
       ? `<table><thead><tr><th>Imagen</th><th>Producto</th><th>Tipo</th><th>Categoría</th><th>Precio</th><th>Estado</th><th style="width:110px"></th></tr></thead><tbody>` +
         products.map((p) => `<tr>
@@ -169,9 +173,10 @@ async function load() {
           <td><span class="td-sub">${esc(catName(p.category_id))}</span></td>
           <td>${fmtUSD(p.base_price, p.currency)}</td>
           <td><span class="status ${statusCls(p.status)}">${p.status}</span></td>
-          <td><div class="flex"><button class="btn btn-ghost btn-sm btn-icon" title="Editar" onclick='openModal("edit", "${p.id}")'><svg class="icon"><use href="#i-edit"/></svg></button><button class="btn btn-danger btn-sm btn-icon" title="Archivar" onclick="archive('${p.id}','${esc(p.name).replace(/'/g, "\\'")}')"><svg class="icon"><use href="#i-trash"/></svg></button></div></td>
+          <td><div class="flex" id="row-actions"><button class="btn btn-ghost btn-sm btn-icon" title="Editar" onclick='openModal("edit", "${p.id}")'><svg class="icon"><use href="#i-edit"/></svg></button><button class="btn btn-danger btn-sm btn-icon" title="Archivar" onclick="archive('${p.id}','${esc(p.name).replace(/'/g, "\\'")}')"><svg class="icon"><use href="#i-trash"/></svg></button></div></td>
         </tr>`).join('') + '</tbody></table>'
       : '<div class="empty">Sin productos que coincidan</div>';
+    if (isReadOnly()) { document.querySelectorAll('#row-actions').forEach(el => el.classList.add('hide')); }
   } catch (e) {
     document.getElementById('list').innerHTML = `<div class="empty">${esc(e.message)}</div>`;
   }
@@ -244,6 +249,7 @@ async function archive(id, name) {
 }
 document.getElementById('pform').addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
 load();
+renderUser();
 </script>
 </body>
 </html>

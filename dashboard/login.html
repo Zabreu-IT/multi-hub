@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ingreso — Multi-Hub Admin</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ff385c'/%3E%3Cstop offset='1' stop-color='%23e31c5f'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='12' cy='12' r='3.4' fill='url(%23g)'/%3E%3Ccircle cx='4.5' cy='6.5' r='2.1' fill='url(%23g)'/%3E%3Ccircle cx='19.5' cy='6.5' r='2.1' fill='url(%23g)'/%3E%3Ccircle cx='4.5' cy='17.5' r='2.1' fill='url(%23g)'/%3E%3Ccircle cx='19.5' cy='17.5' r='2.1' fill='url(%23g)'/%3E%3Cpath d='M6.4 7.6 10.2 10.9M17.6 7.6 13.8 10.9M6.4 16.4 10.2 13.1M17.6 16.4 13.8 13.1M12 8.6v6.8' stroke='url(%23g)' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+  body { display: grid; place-items: center; min-height: 100vh; background: var(--bg); }
+  .login-card { width: min(400px, 92vw); background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 2.2rem 2rem; box-shadow: var(--shadow-hover); }
+  .login-logo { width: 56px; height: 56px; border-radius: 16px; background: var(--grad); display: grid; place-items: center; color: #fff; margin: 0 auto 1rem; }
+  .login-logo .icon { width: 30px; height: 30px; }
+  .login-card h1 { font-family: var(--font-display); font-size: 1.3rem; font-weight: 800; text-align: center; margin-bottom: .2rem; }
+  .login-card .sub { text-align: center; color: var(--text-3); font-size: .85rem; margin-bottom: 1.6rem; }
+  .login-card .field { margin-bottom: 1rem; }
+  .login-err { color: var(--red); font-size: .85rem; min-height: 1.2rem; margin-top: .6rem; text-align: center; }
+  .login-demo { margin-top: 1.4rem; padding-top: 1.2rem; border-top: 1px dashed var(--border-2); font-size: .78rem; color: var(--text-3); text-align: center; }
+  .login-demo code { background: var(--surface-2); padding: .1rem .4rem; border-radius: 6px; font-size: .75rem; }
+</style>
+</head>
+<body>
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
+  <symbol id="i-logo" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.4" fill="currentColor"/><circle cx="4.5" cy="6.5" r="2.1" fill="currentColor"/><circle cx="19.5" cy="6.5" r="2.1" fill="currentColor"/><circle cx="4.5" cy="17.5" r="2.1" fill="currentColor"/><circle cx="19.5" cy="17.5" r="2.1" fill="currentColor"/><path d="M6.4 7.6 10.2 10.9M17.6 7.6 13.8 10.9M6.4 16.4 10.2 13.1M17.6 16.4 13.8 13.1M12 8.6v6.8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+</svg>
+
+<div class="login-card">
+  <div class="login-logo"><svg class="icon"><use href="#i-logo"/></svg></div>
+  <h1>Multi-Hub Admin</h1>
+  <p class="sub">Panel de control de experiencias</p>
+  <form id="login-form" novalidate>
+    <div class="field">
+      <label for="username">Usuario</label>
+      <input id="username" name="username" type="text" autocomplete="username" placeholder="demo_owner" required>
+    </div>
+    <div class="field">
+      <label for="password">Contraseña</label>
+      <input id="password" name="password" type="password" autocomplete="current-password" placeholder="••••••••" required>
+    </div>
+    <button class="btn btn-primary btn-block" type="submit" id="btn">Ingresar</button>
+    <div class="login-err" id="err" role="alert"></div>
+  </form>
+  <div class="login-demo">
+    Demo: <code>demo_owner</code> / <code>demo-owner-2026</code><br>
+    <code>demo_viewer</code> / <code>demo-viewer-2026</code> (solo lectura)
+  </div>
+</div>
+
+<script src="auth.js"></script>
+<script>
+'use strict';
+(function () {
+  if (getToken()) { location.href = 'index.html'; return; }
+  const form = document.getElementById('login-form');
+  const err = document.getElementById('err');
+  const btn = document.getElementById('btn');
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value;
+    if (!username || !password) { err.textContent = 'Ingresa usuario y contraseña'; return; }
+    err.textContent = '';
+    btn.disabled = true; btn.textContent = 'Ingresando…';
+    try {
+      const r = await fetch('/api/v1/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+      if (r.status === 401) { err.textContent = 'Credenciales inválidas'; return; }
+      if (!r.ok) { err.textContent = 'Error ' + r.status + ' — intenta de nuevo'; return; }
+      const data = await r.json();
+      setAuth(data.token, data.user);
+      location.href = 'index.html';
+    } catch (ex) {
+      err.textContent = 'Error de conexión. Intenta de nuevo.';
+    } finally {
+      btn.disabled = false; btn.textContent = 'Ingresar';
+    }
+  });
+})();
+</script>
+</body>
+</html>

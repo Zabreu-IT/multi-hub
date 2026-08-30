@@ -38,6 +38,7 @@
       <a class="side-link" href="connectors.html"><svg class="icon"><use href="#i-plug"/></svg> Conectores</a>
       <p class="nav-sec">Sitio</p>
       <a class="side-link" href="/" target="_blank"><svg class="icon"><use href="#i-external"/></svg> Ver sitio público</a>
+    <div id="user-chip" style="margin-top:1rem"></div>
     </nav>
   </aside>
 
@@ -62,8 +63,10 @@
 </div>
 <div id="toasts" aria-live="polite"></div>
 
+<script src="auth.js"></script>
 <script>
 'use strict';
+if (!requireAuth()) {}
 const API = '/api/v1';
 let orders = [], products = [];
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
@@ -73,8 +76,8 @@ const fmtUSD = (n, c) => `${c} ${Number(n).toLocaleString('es', { maximumFractio
 const fmtDate = (s) => s ? new Date(s).toLocaleString('es', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) : '—';
 
 function toast(msg, type) { const el = document.createElement('div'); el.className = 'toast' + (type ? ' ' + type : ''); el.textContent = msg; document.getElementById('toasts').appendChild(el); setTimeout(() => el.remove(), 3500); }
-async function get(path) { const r = await fetch(API + path); if (!r.ok) { let d = {}; try { d = await r.json(); } catch (e) {} throw new Error(d.detail || 'Error ' + r.status); } return r.json(); }
-async function api(path, method, body) { const r = await fetch(API + path, { method, headers: { 'Content-Type': 'application/json' }, body: body ? JSON.stringify(body) : undefined }); if (!r.ok) { let d = {}; try { d = await r.json(); } catch (e) {} throw new Error(d.detail || 'Error ' + r.status); } return r.json().catch(() => ({})); }
+async function get(path) { const r = await authFetch(API + path); if (!r.ok) { let d = {}; try { d = await r.json(); } catch (e) {} throw new Error(d.detail || 'Error ' + r.status); } return r.json(); }
+async function api(path, method, body) { const r = await authFetch(API + path, { method, headers: { 'Content-Type': 'application/json' }, body: body ? JSON.stringify(body) : undefined }); if (!r.ok) { let d = {}; try { d = await r.json(); } catch (e) {} throw new Error(d.detail || 'Error ' + r.status); } return r.json().catch(() => ({})); }
 
 async function load() {
   try {
@@ -146,6 +149,7 @@ async function saveStatus(id) {
   } catch (e) { toast(e.message, 'error'); }
 }
 load();
+renderUser();
 </script>
 </body>
 </html>
