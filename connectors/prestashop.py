@@ -39,6 +39,7 @@ class PrestashopConnector(BaseConnector):
 </prestashop>"""
             r = await c.post(
                 "/api/carts",
+                params={"output_format": "JSON"},
                 content=cart_xml.encode(),
                 headers={"Content-Type": "application/xml"},
             )
@@ -62,6 +63,7 @@ class PrestashopConnector(BaseConnector):
 </prestashop>"""
             r2 = await c.post(
                 "/api/orders",
+                params={"output_format": "JSON"},
                 content=order_xml.encode(),
                 headers={"Content-Type": "application/xml"},
             )
