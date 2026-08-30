@@ -18,6 +18,11 @@ class OrderData:
     quantity: int
     total_amount: float
     customer_email: str
+    customer_name: str = ""
+    customer_phone: str = ""
+    date_from: str = ""
+    date_to: str = ""
+    currency: str = "USD"
 
 
 @dataclass
