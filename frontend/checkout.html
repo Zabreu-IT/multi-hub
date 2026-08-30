@@ -1,1 +1,237 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><script src="https://cdn.tailwindcss.com"></script><link rel="stylesheet" href="styles.css"><title>Reserva</title></head><body class="p-6"><main class="max-w-xl mx-auto glass p-6 rounded-2xl"><a href="index.html">← Inicio</a><h1 class="text-3xl my-5">Completa tu reserva</h1><form id="f" class="grid gap-3"><input name="customer_name" placeholder="Nombre completo" required><input name="customer_email" type="email" placeholder="Email" required><input name="date_from" type="date"><input name="quantity" type="number" value="1" min="1"><button>Confirmar reserva</button></form><p id="message" class="mt-4"></p></main><script>f.onsubmit=async e=>{e.preventDefault();let d=Object.fromEntries(new FormData(f)),p=await (await fetch('/api/v1/products/'+new URLSearchParams(location.search).get('id'))).json();d.product_id=p.id;d.quantity=+d.quantity;d.total_amount=+(p.base_price*d.quantity);d.currency=p.currency;d.metadata={};if(!d.date_from)delete d.date_from;let r=await fetch('/api/v1/orders',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)});message.textContent=r.ok?'Reserva creada. Recibirás la confirmación por email.':(await r.json()).detail}</script></body></html>
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reserva — Multi-Hub</title>
+  <meta name="description" content="Completa tu solicitud de reserva en Multi-Hub.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Multi-Hub">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23a78bfa'/%3E%3Cstop offset='.5' stop-color='%238b5cf6'/%3E%3Cstop offset='1' stop-color='%2322d3ee'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M12 2l3.6 6.4L22 12l-6.4 3.6L12 22l-3.6-6.4L2 12l6.4-3.6L12 2z' fill='url(%23g)'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
+    <symbol id="i-logo" viewBox="0 0 24 24"><path d="M12 2l3.6 6.4L22 12l-6.4 3.6L12 22l-3.6-6.4L2 12l6.4-3.6L12 2z"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4m-5 4h18"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+    <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></symbol>
+    <symbol id="i-wa" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></symbol>
+    <symbol id="i-code" viewBox="0 0 24 24"><path d="m8 7-5 5 5 5m8-10 5 5-5 5m-3-12-2 14"/></symbol>
+    <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m4 12 5 5L20 6"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 20 6v5c0 5-3.4 8-8 10-4.6-2-8-5-8-10V6l8-3Z"/><path d="m9 12 2 2 4-4"/></symbol>
+  </svg>
+
+  <header class="nav">
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">
+        <span class="nav-logo"><svg class="ic ic-fill" aria-hidden="true"><use href="#i-logo"/></svg></span>
+        Multi-Hub
+      </a>
+      <nav class="nav-links" aria-label="Navegación principal">
+        <a href="/">Inicio</a>
+        <a href="results.html">Experiencias</a>
+        <a href="como-funciona.html">Cómo funciona</a>
+        <a href="/#categorias">Categorías</a>
+      </nav>
+      <a href="/dashboard/" class="nav-cta">
+        <svg class="ic" aria-hidden="true"><use href="#i-grid"/></svg> Panel de administración
+      </a>
+      <button class="nav-toggle" type="button" aria-label="Abrir menú" aria-expanded="false" aria-controls="menu-movil">
+        <svg class="ic ic-open" aria-hidden="true"><use href="#i-menu"/></svg>
+        <svg class="ic ic-close" aria-hidden="true" style="display:none"><use href="#i-x"/></svg>
+      </button>
+    </div>
+    <nav id="menu-movil" class="nav-mobile" aria-label="Menú móvil">
+      <a href="/">Inicio</a>
+      <a href="results.html">Experiencias</a>
+      <a href="como-funciona.html">Cómo funciona</a>
+      <a href="/#categorias">Categorías</a>
+      <a href="/dashboard/" class="btn btn-ghost">Panel de administración</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="section">
+      <div class="container">
+        <nav class="breadcrumb" aria-label="Ruta de navegación"><a href="results.html">Experiencias</a> <span>/</span> <span>Reserva</span></nav>
+        <div id="app" class="checkout-layout">
+          <div class="loading"><span class="spinner" aria-hidden="true"></span> Cargando…</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="/" class="nav-brand">
+            <span class="nav-logo"><svg class="ic ic-fill" aria-hidden="true"><use href="#i-logo"/></svg></span>
+            Multi-Hub
+          </a>
+          <p>El hub universal de experiencias. Un solo lugar para descubrir, comparar y reservar planes inolvidables.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Explorar</h4>
+          <a href="/">Inicio</a>
+          <a href="results.html">Experiencias</a>
+          <a href="como-funciona.html">Cómo funciona</a>
+        </div>
+        <div class="footer-col">
+          <h4>Para negocios</h4>
+          <a href="/dashboard/">Panel de administración</a>
+          <a href="/docs">API Docs</a>
+        </div>
+        <div class="footer-col">
+          <h4>Ayuda</h4>
+          <a href="https://wa.me/50600000000" target="_blank" rel="noopener">Escríbenos por WhatsApp</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>© <span class="year">2026</span> Multi-Hub — Hub Universal de Experiencias</p>
+      </div>
+    </div>
+  </footer>
+
+  <a class="wa-float" href="https://wa.me/50600000000" target="_blank" rel="noopener" aria-label="Escríbenos por WhatsApp">
+    <svg class="ic ic-fill" aria-hidden="true"><use href="#i-wa"/></svg>
+  </a>
+
+  <script src="hub_engine.js"></script>
+  <script>
+    initNav();
+    initYear();
+
+    (async function init() {
+      const id = new URLSearchParams(location.search).get('id');
+      const app = document.getElementById('app');
+      if (!id) {
+        app.innerHTML = '<div class="empty-state"><h3>Reserva no válida</h3><p>Selecciona una experiencia del catálogo para reservar.</p><a href="results.html" class="btn btn-primary" style="margin-top:1.2rem">Ver catálogo</a></div>';
+        return;
+      }
+      let p;
+      try { p = await product(id); } catch (e) {
+        app.innerHTML = '<div class="empty-state"><h3>No pudimos cargar la experiencia</h3><p>Intenta de nuevo en unos momentos.</p><a href="results.html" class="btn btn-primary" style="margin-top:1.2rem">Ver catálogo</a></div>';
+        return;
+      }
+      document.title = `Reserva — ${p.name} — Multi-Hub`;
+      const t = typeInfo(p.product_type);
+      const venue = p.metadata && p.metadata.venue;
+      const starts = p.metadata && p.metadata.starts_at;
+      app.innerHTML = `
+        <div class="checkout-form">
+          <h1>Completa tu solicitud</h1>
+          <p class="checkout-intro">Cuéntanos quién eres y cuándo quieres vivir la experiencia. Te contactaremos para coordinar los detalles.</p>
+          <form id="f" class="form-grid" novalidate>
+            <div class="field">
+              <label for="customer_name">Nombre completo *</label>
+              <input id="customer_name" name="customer_name" type="text" placeholder="Tu nombre" required>
+            </div>
+            <div class="field">
+              <label for="customer_email">Correo electrónico *</label>
+              <input id="customer_email" name="customer_email" type="email" placeholder="tu@email.com" required>
+            </div>
+            <div class="field">
+              <label for="date_from">Fecha deseada</label>
+              <input id="date_from" name="date_from" type="date">
+            </div>
+            <div class="field">
+              <label for="quantity">Personas</label>
+              <input id="quantity" name="quantity" type="number" value="1" min="1" max="20">
+            </div>
+            <div class="field field-full">
+              <label for="notes">Notas (opcional)</label>
+              <textarea id="notes" name="notes" rows="3" placeholder="¿Algún detalle que debamos saber?"></textarea>
+            </div>
+            <div class="field field-full">
+              <button class="btn btn-primary btn-block" type="submit">Enviar solicitud de reserva</button>
+            </div>
+          </form>
+          <p id="message" class="form-note" role="status" aria-live="polite"></p>
+        </div>
+        <aside class="checkout-summary">
+          <h2>Resumen</h2>
+          <div class="summary-item">
+            <span class="summary-thumb">${imgHTML(p)}</span>
+            <div>
+              <strong>${esc(p.name)}</strong>
+              <small>${t.emoji} ${t.label}${venue ? ' · ' + esc(venue) : ''}</small>
+            </div>
+          </div>
+          ${starts ? `<div class="summary-line"><span>Horario</span><strong>${esc(starts)}</strong></div>` : ''}
+          <div class="summary-line"><span>Precio por persona</span><strong>${money(p.base_price, p.currency)}</strong></div>
+          <div class="summary-line"><span>Personas</span><strong id="sum-qty">1</strong></div>
+          <div class="summary-total"><span>Total estimado</span><strong id="sum-total">${money(p.base_price, p.currency)}</strong></div>
+          <p class="summary-note"><svg class="ic" aria-hidden="true"><use href="#i-shield"/></svg> Sin pago en línea por ahora. Envías tu solicitud y nuestro equipo te contacta para coordinar.</p>
+        </aside>`;
+      reveal();
+
+      const qty = document.getElementById('quantity');
+      const sumQty = document.getElementById('sum-qty');
+      const sumTotal = document.getElementById('sum-total');
+      qty.addEventListener('input', () => {
+        const n = Math.max(1, parseInt(qty.value, 10) || 1);
+        sumQty.textContent = n;
+        sumTotal.textContent = money(Number(p.base_price) * n, p.currency);
+      });
+
+      document.getElementById('f').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const msg = document.getElementById('message');
+        const form = e.target;
+        const name = form.customer_name.value.trim();
+        const email = form.customer_email.value.trim();
+        if (!name || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+          msg.innerHTML = '<span class="error">Completa tu nombre y un correo válido.</span>';
+          return;
+        }
+        const d = {
+          customer_name: name,
+          customer_email: email,
+          product_id: p.id,
+          quantity: Math.max(1, parseInt(form.quantity.value, 10) || 1),
+          total_amount: Number(p.base_price) * Math.max(1, parseInt(form.quantity.value, 10) || 1),
+          currency: p.currency,
+          metadata: { notes: form.notes.value.trim() }
+        };
+        if (form.date_from.value) d.date_from = form.date_from.value;
+        msg.innerHTML = '<span class="loading"><span class="spinner" aria-hidden="true"></span> Enviando…</span>';
+        try {
+          const r = await fetch('/api/v1/orders', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(d)
+          });
+          if (r.ok) {
+            const data = await r.json().catch(() => ({}));
+            app.innerHTML = `
+              <div class="success">
+                <div class="check-orb"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg></div>
+                <h2>Solicitud recibida</h2>
+                <p>Gracias, ${esc(name)}. Hemos registrado tu solicitud para <strong>${esc(p.name)}</strong> y nuestro equipo te contactará a <strong>${esc(email)}</strong> para coordinar los detalles.</p>
+                ${data.id ? `<span class="ref">Referencia: ${esc(data.id.slice(0, 8))}</span>` : ''}
+                <div style="margin-top:1.6rem">
+                  <a href="results.html" class="btn btn-primary">Seguir explorando <svg class="ic" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+                </div>
+              </div>`;
+          } else {
+            const err = await r.json().catch(() => ({}));
+            msg.innerHTML = `<span class="error">${esc(err.detail || 'No pudimos registrar tu solicitud. Intenta de nuevo.')}</span>`;
+          }
+        } catch (err) {
+          msg.innerHTML = '<span class="error">Error de conexión. Intenta de nuevo en unos momentos.</span>';
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

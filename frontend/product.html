@@ -1,1 +1,154 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><script src="https://cdn.tailwindcss.com"></script><link rel="stylesheet" href="styles.css"><title>Experiencia</title></head><body class="p-6"><main id="app" class="max-w-4xl mx-auto"></main><script src="hub_engine.js"></script><script>(async()=>{let id=new URLSearchParams(location.search).get('id'),r=await fetch(api+'/products/'+id),p=await r.json();app.innerHTML=`<a href="results.html">← Resultados</a><img class="w-full h-80 object-cover rounded-2xl mt-5" src="${p.images[0]||'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1000'}" alt=""><section class="glass p-6 rounded-2xl mt-5"><h1 class="text-3xl font-bold">${esc(p.name)}</h1><p class="my-4 text-slate-300">${esc(p.description||p.description_short||'Una experiencia para recordar.')}</p><b class="text-2xl">${p.currency} ${p.base_price}</b><a class="block mt-5"><button onclick="location='checkout.html?id=${p.id}'">Reservar</button></a></section>`})()</script></body></html>
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Experiencia — Multi-Hub</title>
+  <meta name="description" content="Detalle de experiencia: reserva tu próxima aventura en Multi-Hub.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Multi-Hub">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23a78bfa'/%3E%3Cstop offset='.5' stop-color='%238b5cf6'/%3E%3Cstop offset='1' stop-color='%2322d3ee'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M12 2l3.6 6.4L22 12l-6.4 3.6L12 22l-3.6-6.4L2 12l6.4-3.6L12 2z' fill='url(%23g)'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
+    <symbol id="i-logo" viewBox="0 0 24 24"><path d="M12 2l3.6 6.4L22 12l-6.4 3.6L12 22l-3.6-6.4L2 12l6.4-3.6L12 2z"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4m-5 4h18"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+    <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></symbol>
+    <symbol id="i-wa" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></symbol>
+    <symbol id="i-code" viewBox="0 0 24 24"><path d="m8 7-5 5 5 5m8-10 5 5-5 5m-3-12-2 14"/></symbol>
+    <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></symbol>
+  </svg>
+
+  <header class="nav">
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">
+        <span class="nav-logo"><svg class="ic ic-fill" aria-hidden="true"><use href="#i-logo"/></svg></span>
+        Multi-Hub
+      </a>
+      <nav class="nav-links" aria-label="Navegación principal">
+        <a href="/">Inicio</a>
+        <a href="results.html">Experiencias</a>
+        <a href="como-funciona.html">Cómo funciona</a>
+        <a href="/#categorias">Categorías</a>
+      </nav>
+      <a href="/dashboard/" class="nav-cta">
+        <svg class="ic" aria-hidden="true"><use href="#i-grid"/></svg> Panel de administración
+      </a>
+      <button class="nav-toggle" type="button" aria-label="Abrir menú" aria-expanded="false" aria-controls="menu-movil">
+        <svg class="ic ic-open" aria-hidden="true"><use href="#i-menu"/></svg>
+        <svg class="ic ic-close" aria-hidden="true" style="display:none"><use href="#i-x"/></svg>
+      </button>
+    </div>
+    <nav id="menu-movil" class="nav-mobile" aria-label="Menú móvil">
+      <a href="/">Inicio</a>
+      <a href="results.html">Experiencias</a>
+      <a href="como-funciona.html">Cómo funciona</a>
+      <a href="/#categorias">Categorías</a>
+      <a href="/dashboard/" class="btn btn-ghost">Panel de administración</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="section">
+      <div class="container">
+        <nav class="breadcrumb" aria-label="Ruta de navegación"><a href="results.html">Experiencias</a> <span>/</span> <span id="crumb-name">Detalle</span></nav>
+        <div id="app" class="product-layout">
+          <div class="loading"><span class="spinner" aria-hidden="true"></span> Cargando experiencia…</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="/" class="nav-brand">
+            <span class="nav-logo"><svg class="ic ic-fill" aria-hidden="true"><use href="#i-logo"/></svg></span>
+            Multi-Hub
+          </a>
+          <p>El hub universal de experiencias. Un solo lugar para descubrir, comparar y reservar planes inolvidables.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Explorar</h4>
+          <a href="/">Inicio</a>
+          <a href="results.html">Experiencias</a>
+          <a href="como-funciona.html">Cómo funciona</a>
+        </div>
+        <div class="footer-col">
+          <h4>Para negocios</h4>
+          <a href="/dashboard/">Panel de administración</a>
+          <a href="/docs">API Docs</a>
+        </div>
+        <div class="footer-col">
+          <h4>Ayuda</h4>
+          <a href="https://wa.me/50600000000" target="_blank" rel="noopener">Escríbenos por WhatsApp</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>© <span class="year">2026</span> Multi-Hub — Hub Universal de Experiencias</p>
+      </div>
+    </div>
+  </footer>
+
+  <a class="wa-float" href="https://wa.me/50600000000" target="_blank" rel="noopener" aria-label="Escríbenos por WhatsApp">
+    <svg class="ic ic-fill" aria-hidden="true"><use href="#i-wa"/></svg>
+  </a>
+
+  <script src="hub_engine.js"></script>
+  <script>
+    initNav();
+    initYear();
+
+    (async function init() {
+      const id = new URLSearchParams(location.search).get('id');
+      const app = document.getElementById('app');
+      if (!id) {
+        app.innerHTML = '<div class="empty-state"><h3>Experiencia no encontrada</h3><p>El enlace no incluye una experiencia válida.</p><a href="results.html" class="btn btn-primary" style="margin-top:1.2rem">Ver catálogo</a></div>';
+        return;
+      }
+      try {
+        const p = await product(id);
+        document.title = `${p.name} — Multi-Hub`;
+        document.getElementById('crumb-name').textContent = p.name;
+        const t = typeInfo(p.product_type);
+        const venue = p.metadata && p.metadata.venue;
+        const starts = p.metadata && p.metadata.starts_at;
+        const waMsg = encodeURIComponent(`Hola, quiero más información sobre "${p.name}" (${money(p.base_price, p.currency)}).`);
+        app.innerHTML = `
+          <div class="product-gallery reveal">
+            ${imgHTML(p, 'gallery-img')}
+            <span class="badge card-type">${t.emoji} ${t.label}</span>
+          </div>
+          <div class="product-info reveal">
+            <h1>${esc(p.name)}</h1>
+            ${p.description_short || p.description ? `<p class="product-desc">${esc(p.description_short || p.description)}</p>` : ''}
+            <div class="product-meta">
+              ${venue ? `<div class="meta-item"><svg class="ic" aria-hidden="true"><use href="#i-pin"/></svg><div><strong>Lugar</strong><span>${esc(venue)}</span></div></div>` : ''}
+              ${starts ? `<div class="meta-item"><svg class="ic" aria-hidden="true"><use href="#i-clock"/></svg><div><strong>Horario</strong><span>${esc(starts)}</span></div></div>` : ''}
+              <div class="meta-item"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg><div><strong>Reserva</strong><span>Disponible bajo solicitud</span></div></div>
+            </div>
+            <div class="product-price">${money(p.base_price, p.currency)}</div>
+            <div class="product-actions">
+              <a class="btn btn-primary" href="checkout.html?id=${esc(p.id)}">Reservar ahora <svg class="ic" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+              <a class="btn btn-ghost" href="${WA_LINK}?text=${waMsg}" target="_blank" rel="noopener">Consultar por WhatsApp</a>
+            </div>
+            <p class="product-note">Sin pago en línea por ahora: envías tu solicitud y nuestro equipo te contacta para coordinar.</p>
+          </div>`;
+        reveal();
+      } catch (err) {
+        app.innerHTML = '<div class="empty-state"><h3>No pudimos cargar la experiencia</h3><p>Intenta de nuevo en unos momentos.</p><a href="results.html" class="btn btn-primary" style="margin-top:1.2rem">Ver catálogo</a></div>';
+      }
+    })();
+  </script>
+</body>
+</html>

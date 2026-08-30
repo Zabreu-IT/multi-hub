@@ -1,1 +1,306 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><script src="https://cdn.tailwindcss.com"></script><link rel="stylesheet" href="styles.css"><title>Multi-Hub</title></head><body><main class="max-w-6xl mx-auto p-6"><nav class="flex justify-between items-center"><b class="text-xl">◇ Multi-Hub</b><div class="flex gap-5"><a href="/como-funciona.html">Cómo funciona</a><a href="/dashboard/">Admin</a></div></nav><section class="py-24 text-center"><h1 class="text-5xl font-bold">Encuentra tu próxima experiencia</h1><p class="my-5 text-slate-300">Hoteles, tours, restaurantes y mucho más.</p><form action="results.html" class="glass p-4 rounded-2xl max-w-3xl mx-auto flex gap-3"><input name="q" placeholder="¿A dónde quieres ir?"><button>Buscar</button></form></section><h2 class="text-2xl mb-4">Destacados</h2><div id="cards" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5"></div><footer class="mt-16 border-t border-white/10 pt-6 text-sm text-slate-400 flex justify-between"><span>© Multi-Hub</span><a href="/como-funciona.html">Cómo funciona</a></footer></main><script src="hub_engine.js"></script><script>products().then(p=>cards.innerHTML=p.map(card).join('')||'<p>Aún no hay experiencias publicadas.</p>')</script></body></html>
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Multi-Hub — Hub Universal de Experiencias</title>
+  <meta name="description" content="Marketplace de experiencias: hoteles, tours, restaurantes, spa y eventos. Busca, compara y reserva tu próxima experiencia en un solo lugar.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Multi-Hub">
+  <meta property="og:title" content="Multi-Hub — Hub Universal de Experiencias">
+  <meta property="og:description" content="Hoteles, tours, restaurantes, spa y eventos. Descubre planes inolvidables y reserva en segundos.">
+  <meta name="twitter:card" content="summary">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23a78bfa'/%3E%3Cstop offset='.5' stop-color='%238b5cf6'/%3E%3Cstop offset='1' stop-color='%2322d3ee'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M12 2l3.6 6.4L22 12l-6.4 3.6L12 22l-3.6-6.4L2 12l6.4-3.6L12 2z' fill='url(%23g)'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Iconos SVG compartidos -->
+  <svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
+    <symbol id="i-logo" viewBox="0 0 24 24"><path d="M12 2l3.6 6.4L22 12l-6.4 3.6L12 22l-3.6-6.4L2 12l6.4-3.6L12 2z"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4m-5 4h18"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></symbol>
+    <symbol id="i-up-right" viewBox="0 0 24 24"><path d="M7 17 17 7m-8 0h8v8"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m4 12 5 5L20 6"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+    <symbol id="i-heart" viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.9-8.6a5.5 5.5 0 0 0-.1-7.8Z"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 20 6v5c0 5-3.4 8-8 10-4.6-2-8-5-8-10V6l8-3Z"/><path d="m9 12 2 2 4-4"/></symbol>
+    <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7l1-8z"/></symbol>
+    <symbol id="i-box" viewBox="0 0 24 24"><path d="m3 7 9-4 9 4v10l-9 4-9-4V7Zm0 0 9 4 9-4m-9 4v10"/></symbol>
+    <symbol id="i-store" viewBox="0 0 24 24"><path d="M3 10h18l-2-6H5l-2 6Zm2 0v10h14V10M9 20v-6h6v6"/></symbol>
+    <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9m-8 12h4"/></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 19V5m0 14h16M7 16l4-4 3 2 5-6"/></symbol>
+    <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.4 2.4-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-3.4v-.2a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1-2.4-2.4.1-.1A1.7 1.7 0 0 0 6 15a1.7 1.7 0 0 0-1.6-1H4v-3.4h.2A1.7 1.7 0 0 0 5.8 9a1.7 1.7 0 0 0-.3-1.9l-.1-.1L7.8 4l.1.1a1.7 1.7 0 0 0 1.9.3 1.7 1.7 0 0 0 1-1.6V2.6h3.4v.2a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1 2.4 2.4-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2V14h-.2a1.7 1.7 0 0 0-1.4 1Z"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></symbol>
+    <symbol id="i-code" viewBox="0 0 24 24"><path d="m8 7-5 5 5 5m8-10 5 5-5 5m-3-12-2 14"/></symbol>
+    <symbol id="i-sync" viewBox="0 0 24 24"><path d="M20 7V3l-2 2a8 8 0 0 0-13 3m-1 9v4l2-2a8 8 0 0 0 13-3"/></symbol>
+    <symbol id="i-gauge" viewBox="0 0 24 24"><path d="M5 18a8 8 0 1 1 14 0Z"/><path d="m12 14 4-4"/></symbol>
+    <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8" cy="9" r="1.5"/><path d="m3 17 5-5 4 4 3-3 6 6"/></symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3-8.7A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.13.96.36 1.9.7 2.8a2 2 0 0 1-.45 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.45c.9.34 1.84.57 2.8.7a2 2 0 0 1 1.7 2.05z"/></symbol>
+    <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></symbol>
+    <symbol id="i-wa" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9L12 3z"/></symbol>
+  </svg>
+
+  <!-- Navbar -->
+  <header class="nav">
+    <div class="container nav-inner">
+      <a href="/" class="nav-brand">
+        <span class="nav-logo"><svg class="ic ic-fill" aria-hidden="true"><use href="#i-logo"/></svg></span>
+        Multi-Hub
+      </a>
+      <nav class="nav-links" aria-label="Navegación principal">
+        <a href="/" class="active">Inicio</a>
+        <a href="results.html">Experiencias</a>
+        <a href="como-funciona.html">Cómo funciona</a>
+        <a href="/#categorias">Categorías</a>
+      </nav>
+      <a href="/dashboard/" class="nav-cta">
+        <svg class="ic" aria-hidden="true"><use href="#i-grid"/></svg> Panel de administración
+      </a>
+      <button class="nav-toggle" type="button" aria-label="Abrir menú" aria-expanded="false" aria-controls="menu-movil">
+        <svg class="ic ic-open" aria-hidden="true"><use href="#i-menu"/></svg>
+        <svg class="ic ic-close" aria-hidden="true" style="display:none"><use href="#i-x"/></svg>
+      </button>
+    </div>
+    <nav id="menu-movil" class="nav-mobile" aria-label="Menú móvil">
+      <a href="/">Inicio</a>
+      <a href="results.html">Experiencias</a>
+      <a href="como-funciona.html">Cómo funciona</a>
+      <a href="/#categorias">Categorías</a>
+      <a href="/dashboard/" class="btn btn-ghost">Panel de administración</a>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Hero -->
+    <section class="hero">
+      <div class="hero-glow g1" aria-hidden="true"></div>
+      <div class="hero-glow g2" aria-hidden="true"></div>
+      <div class="hero-glow g3" aria-hidden="true"></div>
+      <div class="container hero-inner">
+        <span class="hero-eyebrow reveal"><span class="eyebrow-dot"></span> Marketplace de experiencias</span>
+        <h1 class="reveal">Tu próxima experiencia, <span class="grad-text">a un clic.</span></h1>
+        <p class="hero-sub reveal">Hoteles, tours, restaurantes, spa y eventos. Descubre planes inolvidables y reserva en segundos.</p>
+        <div class="search-wrap reveal">
+          <form class="search-bar" action="results.html" method="get" role="search">
+            <svg class="ic" aria-hidden="true"><use href="#i-search"/></svg>
+            <input type="search" name="q" placeholder="¿A dónde quieres ir?" aria-label="Buscar experiencias" autocomplete="off">
+            <button type="submit">Buscar</button>
+          </form>
+        </div>
+        <div id="hero-quick" class="hero-quick reveal"><span>Explora:</span></div>
+      </div>
+    </section>
+
+    <!-- Categorías -->
+    <section class="section" id="categorias">
+      <div class="container">
+        <div class="section-head center reveal">
+          <span class="section-eyebrow">Explora por categoría</span>
+          <h2 class="section-title">Encuentra lo que buscas</h2>
+          <p class="section-sub">Desde escapadas de lujo hasta planes locales: todas las experiencias, en un solo lugar.</p>
+        </div>
+        <div id="cats" class="cats-grid"></div>
+      </div>
+    </section>
+
+    <!-- Experiencias destacadas -->
+    <section class="section">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="section-eyebrow">Selección del catálogo</span>
+          <h2 class="section-title">Experiencias destacadas</h2>
+          <p class="section-sub">Una muestra curada de lo mejor que hay disponible ahora mismo.</p>
+        </div>
+        <div id="featured" class="cards-grid"></div>
+      </div>
+    </section>
+
+    <!-- Cómo funciona (resumen) -->
+    <section class="section">
+      <div class="container">
+        <div class="section-head center reveal">
+          <span class="section-eyebrow">Así de simple</span>
+          <h2 class="section-title">Reservar nunca fue tan fácil</h2>
+          <p class="section-sub">Tres pasos para pasar del deseo al plan.</p>
+        </div>
+        <div class="steps">
+          <article class="step reveal">
+            <span class="step-num">1</span>
+            <div class="step-ico"><svg class="ic" aria-hidden="true"><use href="#i-search"/></svg></div>
+            <h3>Busca</h3>
+            <p>Explora por destino, categoría o tipo de experiencia. Filtra lo que te haga sentido.</p>
+          </article>
+          <article class="step reveal">
+            <span class="step-num">2</span>
+            <div class="step-ico"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg></div>
+            <h3>Reserva</h3>
+            <p>Elige tu fecha, indica cuántas personas serán y confirma tu solicitud en segundos.</p>
+          </article>
+          <article class="step reveal">
+            <span class="step-num">3</span>
+            <div class="step-ico"><svg class="ic" aria-hidden="true"><use href="#i-heart"/></svg></div>
+            <h3>Disfruta</h3>
+            <p>Nosotros coordinamos el resto. Tú solo llega y vive la experiencia.</p>
+          </article>
+        </div>
+        <div style="text-align:center;margin-top:2.2rem" class="reveal">
+          <a href="como-funciona.html" class="btn btn-primary">Ver cómo funciona <svg class="ic" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Valores -->
+    <section class="section">
+      <div class="container">
+        <div class="values">
+          <div class="value-card reveal">
+            <svg class="ic" aria-hidden="true"><use href="#i-bolt"/></svg>
+            <div>
+              <h3>Disponibilidad en tiempo real</h3>
+              <p>Los cupos se actualizan al instante para que tu plan no falle.</p>
+            </div>
+          </div>
+          <div class="value-card reveal">
+            <svg class="ic" aria-hidden="true"><use href="#i-shield"/></svg>
+            <div>
+              <h3>Reservas sin fricción</h3>
+              <p>Un proceso claro y transparente, sin letra pequeña ni sorpresas.</p>
+            </div>
+          </div>
+          <div class="value-card reveal">
+            <svg class="ic" aria-hidden="true"><use href="#i-sync"/></svg>
+            <div>
+              <h3>Un hub para todo</h3>
+              <p>Hoteles, restaurantes, tours, spa y eventos: toda tu operación centralizada.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Newsletter -->
+    <section class="section">
+      <div class="container">
+        <div class="newsletter reveal">
+          <span class="section-eyebrow">Mantente al día</span>
+          <h2>Novedades y nuevas experiencias</h2>
+          <p>Suscríbete para descubrir destinos y planes antes que nadie.</p>
+          <form class="news-form" novalidate>
+            <input type="email" name="email" placeholder="tu@email.com" aria-label="Correo electrónico">
+            <button class="btn btn-gold" type="submit">Suscribirme</button>
+          </form>
+          <p class="news-note" role="status" aria-live="polite"></p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="/" class="nav-brand">
+            <span class="nav-logo"><svg class="ic ic-fill" aria-hidden="true"><use href="#i-logo"/></svg></span>
+            Multi-Hub
+          </a>
+          <p>El hub universal de experiencias. Un solo lugar para descubrir, comparar y reservar planes inolvidables.</p>
+          <div class="footer-social" style="margin-top:1.2rem">
+            <a href="https://wa.me/50600000000" target="_blank" rel="noopener" aria-label="WhatsApp"><svg class="ic ic-fill" aria-hidden="true"><use href="#i-wa"/></svg></a>
+            <a href="https://github.com/" target="_blank" rel="noopener" aria-label="GitHub"><svg class="ic" aria-hidden="true"><use href="#i-code"/></svg></a>
+            <a href="mailto:contacto@multi-hub.com" aria-label="Correo"><svg class="ic" aria-hidden="true"><use href="#i-mail"/></svg></a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h4>Explorar</h4>
+          <a href="/">Inicio</a>
+          <a href="results.html">Experiencias</a>
+          <a href="como-funciona.html">Cómo funciona</a>
+          <a href="/#categorias">Categorías</a>
+        </div>
+        <div class="footer-col">
+          <h4>Para negocios</h4>
+          <a href="/dashboard/">Panel de administración</a>
+          <a href="/docs">API Docs</a>
+          <a href="como-funciona.html#negocios">Conecta tu tienda</a>
+          <a href="como-funciona.html#empezar">Empezar ahora</a>
+        </div>
+        <div class="footer-col">
+          <h4>Ayuda</h4>
+          <a href="https://wa.me/50600000000" target="_blank" rel="noopener">Escríbenos por WhatsApp</a>
+          <a href="como-funciona.html">Preguntas frecuentes</a>
+          <a href="/#categorias">Términos y condiciones</a>
+          <a href="/#categorias">Política de privacidad</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>© <span class="year">2026</span> Multi-Hub — Hub Universal de Experiencias</p>
+        <div class="footer-social">
+          <a href="/dashboard/" aria-label="Dashboard"><svg class="ic" aria-hidden="true"><use href="#i-grid"/></svg></a>
+          <a href="/docs" aria-label="API Docs"><svg class="ic" aria-hidden="true"><use href="#i-code"/></svg></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- WhatsApp flotante -->
+  <a class="wa-float" href="https://wa.me/50600000000" target="_blank" rel="noopener" aria-label="Escríbenos por WhatsApp">
+    <svg class="ic ic-fill" aria-hidden="true"><use href="#i-wa"/></svg>
+  </a>
+
+  <script src="hub_engine.js"></script>
+  <script>
+    initNav();
+    initYear();
+    initNewsletter();
+    reveal();
+
+    (async function init() {
+      /* Categorías */
+      const catsEl = document.getElementById('cats');
+      const quickEl = document.getElementById('hero-quick');
+      try {
+        const cats = await categories();
+        if (cats.length) {
+          catsEl.innerHTML = cats.map((c) => `
+            <a class="cat-card reveal" href="results.html?category=${encodeURIComponent(c.id)}">
+              <span class="cat-ico" aria-hidden="true">${catEmoji(c)}</span>
+              <span class="cat-name">${esc(c.name)}</span>
+              <small>Ver experiencias</small>
+            </a>`).join('');
+          quickEl.innerHTML = '<span>Explora:</span> ' + cats.slice(0, 4).map((c) =>
+            `<a href="results.html?category=${encodeURIComponent(c.id)}">${esc(c.name)}</a>`
+          ).join(' · ');
+          reveal();
+        }
+      } catch (err) {
+        catsEl.innerHTML = '<p class="empty-state">No pudimos cargar las categorías.</p>';
+      }
+
+      /* Destacadas */
+      const gridEl = document.getElementById('featured');
+      try {
+        const list = await products();
+        const featured = list.slice(0, 6);
+        gridEl.innerHTML = featured.length
+          ? featured.map((p) => card(p)).join('')
+          : '<div class="empty-state"><svg class="ic" aria-hidden="true"><use href="#i-heart"/></svg><h3>Aún no hay experiencias publicadas</h3><p>Vuelve pronto: estamos curando nuevas aventuras.</p></div>';
+        reveal();
+      } catch (err) {
+        gridEl.innerHTML = '<div class="empty-state"><svg class="ic" aria-hidden="true"><use href="#i-heart"/></svg><h3>No pudimos cargar las experiencias</h3><p>Intenta de nuevo en unos momentos.</p></div>';
+      }
+    })();
+  </script>
+</body>
+</html>
