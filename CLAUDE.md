@@ -31,3 +31,9 @@ SOLO frontend/: index.html, product.html, results.html, checkout.html, como-func
 - HTML semántico, CSS custom (no Tailwind CDN), JS vanilla sin dependencias
 - Archivos autocontenidos, sin build step
 - Código limpio, comentado en español
+
+## Admin Auth (2026-08-30)
+- Login: https://hub.zabreuit.com/dashboard/login.html
+- Usuarios demo: demo_owner/demo-owner-2026 (owner), demo_admin/demo-admin-2026 (admin), demo_viewer/demo-viewer-2026 (viewer, solo lectura)
+- ⚠️ CAMBIAR passwords demo antes de compartir: docker exec multi-hub-api-1 python scripts/seed_admin.py (usa env DEMO_*_PASS)
+- Endpoints admin protegidos con JWT (require_admin en api/security.py). Mutaciones exigen owner/admin. Checkout público (POST /orders) y GET products/categories siguen abiertos.
