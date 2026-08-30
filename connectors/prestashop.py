@@ -37,7 +37,7 @@ class PrestashopConnector(BaseConnector):
   </cart>
 </prestashop>"""
             r = await c.post(
-                f"{self._url()}/api/carts",
+                "/api/carts",
                 content=cart_xml.encode(),
                 headers={"Content-Type": "application/xml"},
             )
@@ -60,7 +60,7 @@ class PrestashopConnector(BaseConnector):
   </order>
 </prestashop>"""
             r2 = await c.post(
-                f"{self._url()}/api/orders",
+                "/api/orders",
                 content=order_xml.encode(),
                 headers={"Content-Type": "application/xml"},
             )
