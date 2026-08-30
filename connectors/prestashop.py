@@ -70,8 +70,8 @@ class PrestashopConnector(BaseConnector):
     <total_products>{order_data.total_amount:.2f}</total_products>
     <total_products_wt>{order_data.total_amount:.2f}</total_products_wt>
     <conversion_rate>1.000000</conversion_rate>
-    <payment>bankwire</payment>
-    <module>bankwire</module>
+    <payment>ps_wirepayment</payment>
+    <module>ps_wirepayment</module>
     <id_cart>{cart_id}</id_cart>
   </order>
 </prestashop>"""
