@@ -20,21 +20,20 @@ En la llamada podremos conocer las necesidades de tu negocio, resolver tus dudas
 
 Queremos que esta primera conversación sea útil, cercana y enfocada en las oportunidades reales de tu negocio.
 
-Puedes agendar una conversación de 30 minutos en https://calendly.com/ingeniartedevelopers/30min. También puedes conocer más sobre nosotros en https://www.ingeniarte.net.
+Puedes conocer más sobre nosotros y nuestros servicios en https://zabreuit.com.
 
 Saludos,
-Pablo Devia
-IngeniArte Developers"""
+Equipo Zabreuit"""
 
 
 def valid_body(body: str) -> bool:
-    return 120 <= len(body.split()) <= 180 and all(item in body for item in ("https://calendly.com/ingeniartedevelopers/30min", "https://www.ingeniarte.net", "Pablo Devia", "IngeniArte Developers"))
+    return 100 <= len(body.split()) <= 220 and all(item in body for item in ("https://zabreuit.com", "Zabreuit"))
 
 
 def generate_welcome_email(lead: dict) -> tuple[str, str]:
     if not (api_key := os.getenv("OPENROUTER_API_KEY")):
         return fallback_email(lead)
-    prompt = f'''Redacta un correo breve, amigable y no técnico en español para {lead.get("business_name") or lead.get("name") or "un nuevo cliente"}. Agradece su interés en Multi-Hub y explica que un asesor le ayudará personalmente a configurar su hub (catálogo, disponibilidad y reservas). Incluye https://calendly.com/ingeniartedevelopers/30min, https://www.ingeniarte.net y la firma "Pablo Devia, IngeniArte Developers". Debe tener 120-180 palabras. Devuelve únicamente el correo, con "Asunto: ..." como primera línea.'''
+    prompt = f'''Redacta un correo breve, amigable y no técnico en español para {lead.get("business_name") or lead.get("name") or "un nuevo cliente"}. Agradece su interés en Multi-Hub y explica que un asesor le ayudará personalmente a configurar su hub (catálogo, disponibilidad y reservas). Incluye https://zabreuit.com y la firma "Equipo Zabreuit". Debe tener 100-220 palabras. Devuelve únicamente el correo, con "Asunto: ..." como primera línea.'''
     try:
         response = requests.post(
             "https://openrouter.ai/api/v1/chat/completions",
@@ -56,12 +55,12 @@ def send_email(to_email, subject, body):
     try:
         host = os.getenv("SMTP_HOST", "smtp.zoho.com")
         port = int(os.getenv("SMTP_PORT", "465"))
-        user = os.getenv("SMTP_USER", "info@ingeniartecr.com")
+        user = os.getenv("SMTP_USER", "hola@zabreuit.com")
         password = os.getenv("SMTP_PASS")
         if not password:
             return {"success": False, "error": "SMTP_PASS is not configured"}
         message = EmailMessage()
-        message["From"] = f"IngeniArte Developers <{user}>"
+        message["From"] = f"Zabreuit <{user}>"
         message["To"] = to_email
         message["Subject"] = subject
         message.set_content(body)
