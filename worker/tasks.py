@@ -13,6 +13,12 @@ from connectors.shopify import ShopifyConnector
 from connectors.woocommerce import WooCommerceConnector
 
 celery = Celery("multihub", broker=os.getenv("CELERY_BROKER_URL", "redis://redis:6379/0"), backend=os.getenv("CELERY_RESULT_BACKEND", "redis://redis:6379/0"))
+celery.conf.beat_schedule = {
+    "sync-active-connectors-every-minute": {
+        "task": "worker.tasks.reconcile_connectors",
+        "schedule": 60.0,
+    }
+}
 logger = logging.getLogger(__name__)
 def connector_for(record): return {"native": NativeConnector, "prestashop": PrestashopConnector, "shopify": ShopifyConnector, "woocommerce": WooCommerceConnector}[record.platform](record.config)
 
