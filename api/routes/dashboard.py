@@ -4,8 +4,8 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 from core.database import get_db
 from core.models import Order, Product
-from api.security import authorize
-router=APIRouter(prefix="/dashboard",tags=["dashboard"],dependencies=[Depends(authorize)])
+from api.security import require_admin
+router=APIRouter(prefix="/dashboard",tags=["dashboard"],dependencies=[Depends(require_admin())])
 @router.get("/stats")
 def stats(db:Session=Depends(get_db)):
  today=datetime.combine(date.today(),time.min,tzinfo=timezone.utc)

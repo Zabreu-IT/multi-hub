@@ -10,7 +10,9 @@ from api.routes import products,categories,availability,connectors,orders,dashbo
 @asynccontextmanager
 async def lifespan(app):
  Base.metadata.create_all(engine)
- with engine.begin() as connection: connection.execute(text("ALTER TABLE leads ADD COLUMN IF NOT EXISTS metadata JSONB NOT NULL DEFAULT '{}'::jsonb"))
+ with engine.begin() as connection:
+     connection.execute(text("ALTER TABLE leads ADD COLUMN IF NOT EXISTS metadata JSONB NOT NULL DEFAULT '{}'::jsonb"))
+     connection.execute(text("ALTER TABLE admin_users ADD COLUMN IF NOT EXISTS role VARCHAR(16) NOT NULL DEFAULT 'viewer'"))
  yield
 app=FastAPI(title="Multi-Hub API",version="1.0.0",lifespan=lifespan)
 app.middleware("http")(request_context)

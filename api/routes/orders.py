@@ -7,7 +7,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 from core.database import get_db
 from core.models import Availability, Order, Product
-from api.security import authorize
+from api.security import require_admin
 router=APIRouter(prefix="/orders",tags=["orders"])
 class OrderIn(BaseModel):
  product_id:UUID; customer_name:str=Field(min_length=1); customer_email:str=Field(pattern=r"^[^@\s]+@[^@\s]+\.[^@\s]+$"); customer_phone:str|None=None; date_from:date|None=None; date_to:date|None=None; quantity:int=Field(default=1,ge=1); total_amount:Decimal=Field(ge=0); currency:str="USD"; metadata:dict={}
@@ -22,17 +22,17 @@ def create(data:OrderIn,db:Session=Depends(get_db)):
   if a and a.slots_available<data.quantity: raise HTTPException(409,"Not enough availability")
   if a: a.slots_available-=data.quantity
  x=Order(**data.model_dump(exclude={'metadata'}),metadata_=data.metadata); db.add(x); db.commit(); db.refresh(x); return out(x)
-@router.get("",response_model=list[OrderOut],dependencies=[Depends(authorize)])
+@router.get("",response_model=list[OrderOut],dependencies=[Depends(require_admin())])
 def list_orders(status:str|None=None,db:Session=Depends(get_db)):
  q=select(Order); q=q.where(Order.status==status) if status else q
  return [out(x) for x in db.scalars(q.order_by(Order.created_at.desc())).all()]
-@router.get("/{id}",response_model=OrderOut,dependencies=[Depends(authorize)])
+@router.get("/{id}",response_model=OrderOut,dependencies=[Depends(require_admin())])
 def get(id:UUID,db:Session=Depends(get_db)):
  x=db.get(Order,id)
  if not x: raise HTTPException(404,"Order not found")
  return out(x)
 class OrderPatch(BaseModel): status:str|None=None; payment_status:str|None=None
-@router.patch("/{id}",response_model=OrderOut,dependencies=[Depends(authorize)])
+@router.patch("/{id}",response_model=OrderOut,dependencies=[Depends(require_admin())])
 def update(id:UUID,data:OrderPatch,db:Session=Depends(get_db)):
  x=db.get(Order,id)
  if not x: raise HTTPException(404,"Order not found")

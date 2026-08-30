@@ -7,7 +7,7 @@ from sqlalchemy import or_, select
 from sqlalchemy.orm import Session
 from core.database import get_db
 from core.models import Availability, Product
-from api.security import authorize
+from api.security import require_admin
 
 router = APIRouter(prefix="/products", tags=["products"])
 
@@ -35,13 +35,13 @@ def list_products(category: UUID | None = None, type: str | None = None, status:
     return [product_out(p) for p in db.scalars(q.order_by(Product.created_at.desc())).all()]
 @router.get("/{id}", response_model=ProductOut)
 def get_product(id: UUID, db: Session = Depends(get_db)): return product_out(one(db,id))
-@router.post("", response_model=ProductOut, dependencies=[Depends(authorize)])
+@router.post("", response_model=ProductOut, dependencies=[Depends(require_admin(["owner", "admin"]))])
 def create_product(data: ProductIn, db: Session = Depends(get_db)):
     p = Product(**data.model_dump(exclude={"metadata"}), metadata_=data.metadata); db.add(p)
     try: db.commit()
     except Exception: db.rollback(); raise HTTPException(409, "Slug already exists")
     db.refresh(p); return product_out(p)
-@router.put("/{id}", response_model=ProductOut, dependencies=[Depends(authorize)])
+@router.put("/{id}", response_model=ProductOut, dependencies=[Depends(require_admin(["owner", "admin"]))])
 def update_product(id: UUID, data: ProductIn, db: Session = Depends(get_db)):
     p = one(db,id)
     for k,v in data.model_dump(exclude={"metadata"}).items(): setattr(p,k,v)
@@ -49,10 +49,10 @@ def update_product(id: UUID, data: ProductIn, db: Session = Depends(get_db)):
     try: db.commit()
     except Exception: db.rollback(); raise HTTPException(409, "Slug already exists")
     return product_out(p)
-@router.delete("/{id}", dependencies=[Depends(authorize)])
+@router.delete("/{id}", dependencies=[Depends(require_admin(["owner", "admin"]))])
 def archive_product(id: UUID, db: Session = Depends(get_db)):
     one(db,id).status="archived"; db.commit(); return {"ok": True}
-@router.post("/{id}/availability", dependencies=[Depends(authorize)])
+@router.post("/{id}/availability", dependencies=[Depends(require_admin(["owner", "admin"]))])
 def set_availability(id: UUID, data: AvailabilityIn, db: Session = Depends(get_db)):
     one(db,id)
     if data.slots_available > data.slots_total: raise HTTPException(422, "slots_available cannot exceed slots_total")

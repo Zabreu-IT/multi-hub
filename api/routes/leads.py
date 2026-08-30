@@ -2,6 +2,7 @@ from datetime import datetime
 import logging
 from uuid import UUID
 from fastapi import APIRouter, Depends
+from api.security import require_admin
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -44,6 +45,6 @@ def create(data: LeadIn, db: Session = Depends(get_db)):
     return lead
 
 
-@router.get("", response_model=list[LeadOut])
+@router.get("", response_model=list[LeadOut], dependencies=[Depends(require_admin())])
 def list_leads(db: Session = Depends(get_db)):
     return db.scalars(select(Lead).order_by(Lead.created_at.desc())).all()

@@ -6,7 +6,8 @@ from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from core.database import get_db
-from core.models import User
+from core.models import AdminUser, User
+import bcrypt
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -15,10 +16,10 @@ JWT_SECRET = getenv("JWT_SECRET", "multihub-jwt-secret-change-in-prod")
 JWT_EXPIRE_HOURS = 72
 
 
-def create_jwt(user_id: str) -> str:
+def create_jwt(user_id: str, role: str | None = None) -> str:
     """Simple JWT-like token (base64 payload + signature)."""
     import base64, hashlib, hmac, json
-    payload = {"sub": user_id, "exp": (datetime.now(timezone.utc) + timedelta(hours=JWT_EXPIRE_HOURS)).isoformat()}
+    payload = {"sub": user_id, "role": role, "exp": (datetime.now(timezone.utc) + timedelta(hours=JWT_EXPIRE_HOURS)).isoformat()}
     body = base64.urlsafe_b64encode(json.dumps(payload).encode()).decode()
     sig = hmac.new(JWT_SECRET.encode(), body.encode(), hashlib.sha256).hexdigest()[:32]
     return f"{body}.{sig}"
@@ -107,6 +108,9 @@ def get_me(authorization: str | None = Header(default=None), db: Session = Depen
     if not authorization or not authorization.startswith("Bearer "):
         raise HTTPException(401, "Not authenticated")
     payload = verify_jwt(authorization.split(" ", 1)[1])
+    admin = db.get(AdminUser, payload["sub"])
+    if admin:
+        return {"id": str(admin.id), "username": admin.username, "role": admin.role}
     user = db.get(User, payload["sub"])
     if not user:
         raise HTTPException(404, "User not found")
@@ -149,3 +153,21 @@ def verify_google_token(id_token: str, client_id: str) -> dict | None:
         return data
     except Exception:
         return None
+
+class LoginRequest(BaseModel):
+    username: str
+    password: str
+
+
+@router.post("/login")
+def login(data: LoginRequest, db: Session = Depends(get_db)):
+    """Login por usuario/contraseña para el panel admin. Devuelve JWT con role."""
+    user = db.scalar(select(AdminUser).where(AdminUser.username == data.username))
+    if not user or not user.is_active:
+        raise HTTPException(401, "Credenciales inválidas")
+    if not bcrypt.checkpw(data.password.encode(), user.password_hash.encode()):
+        raise HTTPException(401, "Credenciales inválidas")
+    user.last_login = datetime.now(timezone.utc)
+    db.commit()
+    token = create_jwt(str(user.id), user.role)
+    return {"token": token, "user": {"id": str(user.id), "username": user.username, "role": user.role}}
