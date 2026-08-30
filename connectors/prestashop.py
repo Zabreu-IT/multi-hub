@@ -26,6 +26,10 @@ class PrestashopConnector(BaseConnector):
     <id_currency>1</id_currency>
     <id_lang>1</id_lang>
     <id_carrier>1</id_carrier>
+    <total_paid>{order_data.total_amount:.2f}</total_paid>
+    <total_paid_real>{order_data.total_amount:.2f}</total_paid_real>
+    <total_products>{order_data.total_amount:.2f}</total_products>
+    <total_products_wt>{order_data.total_amount:.2f}</total_products_wt>
     <id_customer>1</id_customer>
     <associations>
       <cart_rows>
@@ -60,6 +64,10 @@ class PrestashopConnector(BaseConnector):
     <id_currency>1</id_currency>
     <id_lang>1</id_lang>
     <id_carrier>1</id_carrier>
+    <total_paid>{order_data.total_amount:.2f}</total_paid>
+    <total_paid_real>{order_data.total_amount:.2f}</total_paid_real>
+    <total_products>{order_data.total_amount:.2f}</total_products>
+    <total_products_wt>{order_data.total_amount:.2f}</total_products_wt>
     <payment>bankwire</payment>
     <module>bankwire</module>
     <id_cart>{cart_id}</id_cart>
