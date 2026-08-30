@@ -17,7 +17,38 @@ class PrestashopConnector(BaseConnector):
             return n or "Product"
         return [ProductData(name=_name(p), slug=str(p["id"]), price=float(p.get("price", 0)), external_id=str(p["id"])) for p in r.json().get("products", [])]
     async def create_order(self, order_data: OrderData):
-        xml = f"""<?xml version="1.0" encoding="UTF-8"?>
+        # Flujo real PrestaShop: crear carrito -> crear pedido con id_cart
+        async with self._client() as c:
+            # 1. Crear carrito con el producto
+            cart_xml = f"""<?xml version="1.0" encoding="UTF-8"?>
+<prestashop xmlns:xlink="http://www.w3.org/1999/xlink">
+  <cart>
+    <id_currency>1</id_currency>
+    <id_lang>1</id_lang>
+    <id_customer>1</id_customer>
+    <associations>
+      <cart_rows>
+        <cart_row>
+          <id_product>{int(order_data.product_id)}</id_product>
+          <quantity>{order_data.quantity}</quantity>
+        </cart_row>
+      </cart_rows>
+    </associations>
+  </cart>
+</prestashop>"""
+            r = await c.post(
+                f"{self._url()}/api/carts",
+                content=cart_xml.encode(),
+                headers={"Content-Type": "application/xml"},
+            )
+            if r.status_code >= 400:
+                raise RuntimeError(f"PrestaShop create_cart failed: {r.status_code} {r.text[:200]}")
+            cart_id = r.json().get("cart", {}).get("id", "")
+            if not cart_id:
+                raise RuntimeError(f"PrestaShop no cart id: {r.text[:200]}")
+
+            # 2. Crear pedido con id_cart
+            order_xml = f"""<?xml version="1.0" encoding="UTF-8"?>
 <prestashop xmlns:xlink="http://www.w3.org/1999/xlink">
   <order>
     <id_customer>1</id_customer>
@@ -25,20 +56,16 @@ class PrestashopConnector(BaseConnector):
     <id_address_invoice>1</id_address_invoice>
     <payment>bankwire</payment>
     <module>bankwire</module>
-    <associations>
-      <order_rows>
-        <order_row>
-          <product_id>{int(order_data.product_id)}</product_id>
-          <product_quantity>{order_data.quantity}</product_quantity>
-        </order_row>
-      </order_rows>
-    </associations>
+    <id_cart>{cart_id}</id_cart>
   </order>
 </prestashop>"""
-        async with self._client() as c:
-            r = await c.post("/api/orders", content=xml.encode(), headers={"Content-Type": "application/xml"})
-            if not r.is_success:
-                return {"ok": False, "status": r.status_code, "error": r.text[:200]}
-            d = r.json().get("order", {})
-            return {"ok": True, "external_order_id": str(d.get("id")), "status": d.get("current_state")}
+            r2 = await c.post(
+                f"{self._url()}/api/orders",
+                content=order_xml.encode(),
+                headers={"Content-Type": "application/xml"},
+            )
+            if r2.status_code >= 400:
+                raise RuntimeError(f"PrestaShop create_order failed: {r2.status_code} {r2.text[:200]}")
+            return {"external_id": str(r2.json().get("order", {}).get("id", ""))}
+
     async def sync_catalog(self): return SyncResult(errors=["Use worker sync; catalog mapping is platform-specific"])
