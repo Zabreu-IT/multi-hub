@@ -37,3 +37,10 @@ SOLO frontend/: index.html, product.html, results.html, checkout.html, como-func
 - Usuarios demo: demo_owner/demo-owner-2026 (owner), demo_admin/demo-admin-2026 (admin), demo_viewer/demo-viewer-2026 (viewer, solo lectura)
 - ⚠️ CAMBIAR passwords demo antes de compartir: docker exec multi-hub-api-1 python scripts/seed_admin.py (usa env DEMO_*_PASS)
 - Endpoints admin protegidos con JWT (require_admin en api/security.py). Mutaciones exigen owner/admin. Checkout público (POST /orders) y GET products/categories siguen abiertos.
+
+## Conectores verificados (2026-08-30)
+- WooCommerce 11 real (WordPress 6): sync + create_order E2E (Orden 14)
+- PrestaShop 8 real: sync + create_order E2E (Orden 6, flujo cart→order XML)
+- Shopify: mock fiel (SaaS, requiere tienda real)
+- Tiendas demo: woo-app:8090, presta-app:8091 (red multi-hub_default)
+- API keys demo: Woo app password admin:F5VwiQZrEcPgpzvQC2pD1gre, Presta Z4SkWfdhWduY9vs8DAqWpz6PI7W9do79
