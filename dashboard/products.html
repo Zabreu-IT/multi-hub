@@ -1,1 +1,249 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><script src="https://cdn.tailwindcss.com"></script><link rel="stylesheet" href="styles.css"><title>Productos</title></head><body class="p-6"><nav class="mb-8"><a href="index.html">← Dashboard</a></nav><main class="max-w-5xl"><h1 class="text-3xl mb-5">Productos</h1><form id="form" class="glass p-4 rounded-xl grid md:grid-cols-4 gap-3"><input name="name" placeholder="Nombre" required><input name="slug" placeholder="slug-producto" required><input name="base_price" type="number" min="0" step=".01" placeholder="Precio" required><select name="status"><option>draft</option><option>active</option></select><button>Crear</button></form><input id="search" class="my-4" placeholder="Buscar"><table><thead><tr><th>Nombre</th><th>Tipo</th><th>Precio</th><th>Estado</th><th></th></tr></thead><tbody id="rows"></tbody></table></main><script>const h={'Content-Type':'application/json','X-API-Key':localStorage.apiKey||''};async function load(){let r=await fetch('/api/v1/products?search='+encodeURIComponent(search.value));let p=await r.json();rows.innerHTML=p.map(x=>`<tr><td>${x.name}</td><td>${x.product_type}</td><td>${x.currency} ${x.base_price}</td><td>${x.status}</td><td><button onclick="archive('${x.id}')">Archivar</button></td></tr>`).join('')}form.onsubmit=async e=>{e.preventDefault();let d=Object.fromEntries(new FormData(form));d.base_price=Number(d.base_price);d.product_type='custom';d.images=[];d.metadata={};let r=await fetch('/api/v1/products',{method:'POST',headers:h,body:JSON.stringify(d)});if(!r.ok)return alert((await r.json()).detail);form.reset();load()};async function archive(id){await fetch('/api/v1/products/'+id,{method:'DELETE',headers:h});load()}search.oninput=load;load()</script></body></html>
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Productos — Multi-Hub Admin</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ff385c'/%3E%3Cstop offset='1' stop-color='%23e31c5f'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='12' cy='12' r='3.4' fill='url(%23g)'/%3E%3Ccircle cx='4.5' cy='6.5' r='2.1' fill='url(%23g)'/%3E%3Ccircle cx='19.5' cy='6.5' r='2.1' fill='url(%23g)'/%3E%3Ccircle cx='4.5' cy='17.5' r='2.1' fill='url(%23g)'/%3E%3Ccircle cx='19.5' cy='17.5' r='2.1' fill='url(%23g)'/%3E%3Cpath d='M6.4 7.6 10.2 10.9M17.6 7.6 13.8 10.9M6.4 16.4 10.2 13.1M17.6 16.4 13.8 13.1M12 8.6v6.8' stroke='url(%23g)' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
+  <symbol id="i-logo" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.4" fill="currentColor"/><circle cx="4.5" cy="6.5" r="2.1" fill="currentColor"/><circle cx="19.5" cy="6.5" r="2.1" fill="currentColor"/><circle cx="4.5" cy="17.5" r="2.1" fill="currentColor"/><circle cx="19.5" cy="17.5" r="2.1" fill="currentColor"/><path d="M6.4 7.6 10.2 10.9M17.6 7.6 13.8 10.9M6.4 16.4 10.2 13.1M17.6 16.4 13.8 13.1M12 8.6v6.8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7h-6v7H4a1 1 0 0 1-1-1V10Z"/></symbol>
+  <symbol id="i-box" viewBox="0 0 24 24"><path d="M21 8 12 3 3 8v8l9 5 9-5V8Z"/><path d="M3 8l9 5 9-5M12 13v8"/></symbol>
+  <symbol id="i-order" viewBox="0 0 24 24"><path d="M6 3h12l2 4v14H4V7l2-4Z"/><path d="M4 7h16M9 11h6"/></symbol>
+  <symbol id="i-lead" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></symbol>
+  <symbol id="i-plug" viewBox="0 0 24 24"><path d="M12 3v5m0 0v5a3 3 0 0 0 3 3h0M12 8h5a2 2 0 0 1 2 2 5 5 0 0 1-5 5h-2M12 16v5"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 7V3l-2 2a8 8 0 0 0-13 3m-1 9v4l2-2a8 8 0 0 0 13-3"/></symbol>
+  <symbol id="i-edit" viewBox="0 0 24 24"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3Z"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2m1 0v14a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V6m4 4v6m4-6v6"/></symbol>
+  <symbol id="i-external" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4 10 14M18 13v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h6"/></symbol>
+</svg>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="brand"><span class="brand-logo"><svg class="icon"><use href="#i-logo"/></svg></span><div>Multi-Hub<small>Panel de control</small></div></div>
+    <nav class="side-links" aria-label="Navegación del panel">
+      <p class="nav-sec">Operación</p>
+      <a class="side-link" href="index.html"><svg class="icon"><use href="#i-home"/></svg> Resumen</a>
+      <a class="side-link active" href="products.html"><svg class="icon"><use href="#i-box"/></svg> Productos</a>
+      <a class="side-link" href="orders.html"><svg class="icon"><use href="#i-order"/></svg> Pedidos</a>
+      <a class="side-link" href="leads.html"><svg class="icon"><use href="#i-lead"/></svg> Contactos</a>
+      <a class="side-link" href="connectors.html"><svg class="icon"><use href="#i-plug"/></svg> Conectores</a>
+      <p class="nav-sec">Sitio</p>
+      <a class="side-link" href="/" target="_blank"><svg class="icon"><use href="#i-external"/></svg> Ver sitio público</a>
+    </nav>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <h1>Productos</h1>
+      <div class="topbar-actions">
+        <button class="btn btn-primary" onclick="openModal('new')"><svg class="icon"><use href="#i-plus"/></svg> Nuevo producto</button>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <div class="search">
+        <svg class="icon"><use href="#i-search"/></svg>
+        <input id="search" type="search" placeholder="Buscar por nombre o slug…" oninput="load()">
+      </div>
+      <select id="f-type" onchange="load()">
+        <option value="">Todos los tipos</option>
+        <option value="hotel">Hotel</option>
+        <option value="tour">Tour</option>
+        <option value="restaurant">Restaurante</option>
+        <option value="event">Evento</option>
+        <option value="service">Servicio</option>
+      </select>
+      <select id="f-status" onchange="load()">
+        <option value="">Todos los estados</option>
+        <option value="active">Activos</option>
+        <option value="draft">Borradores</option>
+      </select>
+    </div>
+
+    <div id="list" class="table-wrap"><div class="empty">Cargando…</div></div>
+  </main>
+</div>
+
+<div class="modal-back" id="modal">
+  <div class="modal">
+    <h2 id="modal-title">Nuevo producto</h2>
+    <form id="pform" novalidate>
+      <div class="form-grid">
+        <div class="field"><label for="f-name">Nombre *</label><input id="f-name" name="name" value=""><div class="err" id="e-name"></div></div>
+        <div class="field"><label for="f-slug">Slug *</label><input id="f-slug" name="slug" placeholder="mi-experiencia"><div class="err" id="e-slug"></div></div>
+        <div class="field"><label for="f-type">Tipo *</label><select id="f-type2" name="product_type"><option value="hotel">Hotel</option><option value="tour">Tour</option><option value="restaurant">Restaurante</option><option value="event">Evento</option><option value="service">Servicio</option></select><div class="err" id="e-type"></div></div>
+        <div class="field"><label for="f-cat">Categoría *</label><select id="f-cat" name="category_id"></select><div class="err" id="e-cat"></div></div>
+        <div class="field"><label for="f-price">Precio *</label><input id="f-price" name="base_price" type="number" min="0" step="0.01" placeholder="0.00"><div class="err" id="e-price"></div></div>
+        <div class="field"><label for="f-currency">Moneda</label><select id="f-currency" name="currency"><option>USD</option><option>CRC</option><option>EUR</option></select></div>
+        <div class="field"><label for="f-status">Estado</label><select id="f-status2" name="status"><option value="draft">Borrador</option><option value="active">Activo</option></select></div>
+        <div class="field"><label for="f-short">Descripción corta</label><input id="f-short" name="description_short" placeholder="Resumen de una línea"></div>
+      </div>
+      <div class="field mt"><label for="f-desc">Descripción completa</label><textarea id="f-desc" name="description" rows="3" placeholder="Detalle de la experiencia"></textarea></div>
+      <div class="field mt"><label for="f-img">URL de imagen</label><input id="f-img" name="images" placeholder="https://…"><div class="err" id="e-img"></div></div>
+      <div class="modal-foot">
+        <button type="button" class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+<div id="toasts" aria-live="polite"></div>
+
+<script>
+'use strict';
+const API = '/api/v1';
+let products = [], cats = [], editingId = null;
+
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+const TYPE_LABEL = { hotel: 'Hotel', tour: 'Tour', restaurant: 'Restaurante', event: 'Evento', service: 'Servicio', custom: 'Experiencia' };
+const TYPE_EMOJI = { hotel: '🏨', tour: '🧭', restaurant: '🍽️', event: '🎭', service: '✨', custom: '🌟' };
+const statusCls = (s) => ({ active: 'st-active', draft: 'st-draft' }[s] || 'st-draft');
+const fmtUSD = (n, c) => `${c} ${Number(n).toLocaleString('es', { maximumFractionDigits: 2 })}`;
+
+function toast(msg, type) { const el = document.createElement('div'); el.className = 'toast' + (type ? ' ' + type : ''); el.textContent = msg; document.getElementById('toasts').appendChild(el); setTimeout(() => el.remove(), 3500); }
+
+async function get(path, opts) {
+  const r = await fetch(API + path, opts);
+  if (!r.ok) { let d = {}; try { d = await r.json(); } catch (e) {} throw new Error(d.detail || 'Error ' + r.status); }
+  return r.json();
+}
+async function api(path, method, body) {
+  const r = await fetch(API + path, { method, headers: { 'Content-Type': 'application/json' }, body: body ? JSON.stringify(body) : undefined });
+  if (!r.ok) { let d = {}; try { d = await r.json(); } catch (e) {} throw new Error(d.detail || 'Error ' + r.status); }
+  return r.json().catch(() => ({}));
+}
+
+function validators(p) {
+  const errs = {};
+  if (!p.name || !p.name.trim()) errs.name = 'El nombre es obligatorio';
+  else if (p.name.trim().length < 3) errs.name = 'Mínimo 3 caracteres';
+  if (!p.slug || !p.slug.trim()) errs.slug = 'El slug es obligatorio';
+  else if (p.slug.length < 3) errs.slug = 'Mínimo 3 caracteres';
+  else if (!/^[a-z0-9-]+$/.test(p.slug)) errs.slug = 'Solo minúsculas, números y guiones';
+  const price = Number(p.base_price);
+  if (p.base_price === '' || p.base_price === null || p.base_price === undefined || isNaN(price)) errs.price = 'Precio obligatorio';
+  else if (price < 0) errs.price = 'No puede ser negativo';
+  if (!p.category_id) errs.cat = 'Elige una categoría';
+  if (!p.product_type) errs.type = 'Elige un tipo';
+  if (p.images && p.images.trim() && !/^https?:\/\/.+/i.test(p.images.trim())) errs.img = 'Debe ser una URL válida (https://…)';
+  return errs;
+}
+function showErrs(errs) {
+  ['name', 'slug', 'type', 'cat', 'price', 'img'].forEach((k) => {
+    const el = document.getElementById('e-' + k), inp = document.getElementById(k === 'type' ? 'f-type2' : k === 'cat' ? 'f-cat' : k === 'price' ? 'f-price' : 'f-' + k);
+    if (el) el.textContent = errs[k] || '';
+    if (inp) inp.classList.toggle('invalid', !!errs[k]);
+  });
+}
+
+function slugify(s) { return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '').slice(0, 60); }
+
+async function load() {
+  try {
+    const q = document.getElementById('search').value.trim();
+    const type = document.getElementById('f-type').value;
+    const status = document.getElementById('f-status').value;
+    const params = new URLSearchParams();
+    if (q) params.set('search', q);
+    if (type) params.set('type', type);
+    if (status) params.set('status', status);
+    products = await get('/products?' + params.toString());
+    if (!cats.length) cats = await get('/categories');
+    const catName = (id) => (cats.find((c) => c.id === id) || {}).name || '—';
+    document.getElementById('list').innerHTML = products.length
+      ? `<table><thead><tr><th>Imagen</th><th>Producto</th><th>Tipo</th><th>Categoría</th><th>Precio</th><th>Estado</th><th style="width:110px"></th></tr></thead><tbody>` +
+        products.map((p) => `<tr>
+          <td>${p.images && p.images[0] ? `<img src="${esc(p.images[0].split('=')[0] + '=w=64')}" alt="" style="width:44px;height:44px;border-radius:10px;object-fit:cover" onerror="this.style.display='none'">` : `<span style="font-size:1.6rem">${TYPE_EMOJI[p.product_type] || '▪'}</span>`}</td>
+          <td><div class="td-name">${esc(p.name)}</div><div class="td-sub">${esc(p.slug)}</div></td>
+          <td>${TYPE_LABEL[p.product_type] || esc(p.product_type)}</td>
+          <td><span class="td-sub">${esc(catName(p.category_id))}</span></td>
+          <td>${fmtUSD(p.base_price, p.currency)}</td>
+          <td><span class="status ${statusCls(p.status)}">${p.status}</span></td>
+          <td><div class="flex"><button class="btn btn-ghost btn-sm btn-icon" title="Editar" onclick='openModal("edit", "${p.id}")'><svg class="icon"><use href="#i-edit"/></svg></button><button class="btn btn-danger btn-sm btn-icon" title="Archivar" onclick="archive('${p.id}','${esc(p.name).replace(/'/g, "\\'")}')"><svg class="icon"><use href="#i-trash"/></svg></button></div></td>
+        </tr>`).join('') + '</tbody></table>'
+      : '<div class="empty">Sin productos que coincidan</div>';
+  } catch (e) {
+    document.getElementById('list').innerHTML = `<div class="empty">${esc(e.message)}</div>`;
+  }
+}
+
+function fillCats(sel) {
+  cats.forEach((c) => { const o = document.createElement('option'); o.value = c.id; o.textContent = c.name; sel.appendChild(o); });
+}
+async function openModal(mode, id) {
+  editingId = id || null;
+  document.getElementById('pform').reset();
+  showErrs({});
+  document.getElementById('modal-title').textContent = mode === 'edit' ? 'Editar producto' : 'Nuevo producto';
+  const sel = document.getElementById('f-cat');
+  sel.innerHTML = '';
+  await fillCats(sel);
+  if (mode === 'edit' && id) {
+    const p = products.find((x) => x.id === id);
+    if (!p) return toast('Producto no encontrado', 'error');
+    document.getElementById('f-name').value = p.name || '';
+    document.getElementById('f-slug').value = p.slug || '';
+    document.getElementById('f-type2').value = p.product_type || 'custom';
+    sel.value = p.category_id || '';
+    document.getElementById('f-price').value = p.base_price != null ? p.base_price : '';
+    document.getElementById('f-currency').value = p.currency || 'USD';
+    document.getElementById('f-status2').value = p.status || 'draft';
+    document.getElementById('f-short').value = p.description_short || '';
+    document.getElementById('f-desc').value = p.description || '';
+    document.getElementById('f-img').value = p.images && p.images[0] ? p.images[0] : '';
+  }
+  document.getElementById('modal').classList.add('open');
+  document.getElementById('f-name').focus();
+}
+function closeModal() { document.getElementById('modal').classList.remove('open'); }
+document.getElementById('modal').addEventListener('click', (e) => { if (e.target.id === 'modal') closeModal(); });
+document.getElementById('f-name').addEventListener('input', (e) => { if (!editingId && !document.getElementById('f-slug').value.trim()) document.getElementById('f-slug').value = slugify(e.target.value); });
+document.getElementById('f-slug').addEventListener('input', (e) => { e.target.value = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''); });
+
+document.getElementById('pform').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const imageVal = document.getElementById('f-img').value.trim();
+  const p = {
+    name: document.getElementById('f-name').value.trim(),
+    slug: document.getElementById('f-slug').value.trim(),
+    product_type: document.getElementById('f-type2').value,
+    category_id: document.getElementById('f-cat').value,
+    base_price: document.getElementById('f-price').value,
+    currency: document.getElementById('f-currency').value,
+    status: document.getElementById('f-status2').value,
+    description_short: document.getElementById('f-short').value.trim(),
+    description: document.getElementById('f-desc').value.trim(),
+    images: imageVal ? [imageVal] : []
+  };
+  const errs = validators(p);
+  showErrs(errs);
+  if (Object.keys(errs).length) { toast('Revisa los campos marcados', 'error'); return; }
+  p.base_price = Number(p.base_price);
+  for (const k of ['description_short', 'description']) if (!p[k]) delete p[k];
+  try {
+    if (editingId) { await api('/products/' + editingId, 'PUT', p); toast('Producto actualizado'); }
+    else { await api('/products', 'POST', p); toast('Producto creado'); }
+    closeModal(); load();
+  } catch (err) { toast(err.message, 'error'); }
+});
+
+async function archive(id, name) {
+  if (!confirm(`¿Archivar "${name || 'este producto'}"? Ya no aparecerá en el catálogo público.`)) return;
+  try { await api('/products/' + id, 'DELETE'); toast('Producto archivado'); load(); }
+  catch (e) { toast(e.message, 'error'); }
+}
+document.getElementById('pform').addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+load();
+</script>
+</body>
+</html>

@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pedidos — Multi-Hub Admin</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ff385c'/%3E%3Cstop offset='1' stop-color='%23e31c5f'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='12' cy='12' r='3.4' fill='url(%23g)'/%3E%3Ccircle cx='4.5' cy='6.5' r='2.1' fill='url(%23g)'/%3E%3Ccircle cx='19.5' cy='6.5' r='2.1' fill='url(%23g)'/%3E%3Ccircle cx='4.5' cy='17.5' r='2.1' fill='url(%23g)'/%3E%3Ccircle cx='19.5' cy='17.5' r='2.1' fill='url(%23g)'/%3E%3Cpath d='M6.4 7.6 10.2 10.9M17.6 7.6 13.8 10.9M6.4 16.4 10.2 13.1M17.6 16.4 13.8 13.1M12 8.6v6.8' stroke='url(%23g)' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
+  <symbol id="i-logo" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.4" fill="currentColor"/><circle cx="4.5" cy="6.5" r="2.1" fill="currentColor"/><circle cx="19.5" cy="6.5" r="2.1" fill="currentColor"/><circle cx="4.5" cy="17.5" r="2.1" fill="currentColor"/><circle cx="19.5" cy="17.5" r="2.1" fill="currentColor"/><path d="M6.4 7.6 10.2 10.9M17.6 7.6 13.8 10.9M6.4 16.4 10.2 13.1M17.6 16.4 13.8 13.1M12 8.6v6.8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7h-6v7H4a1 1 0 0 1-1-1V10Z"/></symbol>
+  <symbol id="i-box" viewBox="0 0 24 24"><path d="M21 8 12 3 3 8v8l9 5 9-5V8Z"/><path d="M3 8l9 5 9-5M12 13v8"/></symbol>
+  <symbol id="i-order" viewBox="0 0 24 24"><path d="M6 3h12l2 4v14H4V7l2-4Z"/><path d="M4 7h16M9 11h6"/></symbol>
+  <symbol id="i-lead" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></symbol>
+  <symbol id="i-plug" viewBox="0 0 24 24"><path d="M12 3v5m0 0v5a3 3 0 0 0 3 3h0M12 8h5a2 2 0 0 1 2 2 5 5 0 0 1-5 5h-2M12 16v5"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2m1 0v14a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V6m4 4v6m4-6v6"/></symbol>
+  <symbol id="i-external" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4 10 14M18 13v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h6"/></symbol>
+  <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></symbol>
+</svg>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="brand"><span class="brand-logo"><svg class="icon"><use href="#i-logo"/></svg></span><div>Multi-Hub<small>Panel de control</small></div></div>
+    <nav class="side-links" aria-label="Navegación del panel">
+      <p class="nav-sec">Operación</p>
+      <a class="side-link" href="index.html"><svg class="icon"><use href="#i-home"/></svg> Resumen</a>
+      <a class="side-link" href="products.html"><svg class="icon"><use href="#i-box"/></svg> Productos</a>
+      <a class="side-link active" href="orders.html"><svg class="icon"><use href="#i-order"/></svg> Pedidos</a>
+      <a class="side-link" href="leads.html"><svg class="icon"><use href="#i-lead"/></svg> Contactos</a>
+      <a class="side-link" href="connectors.html"><svg class="icon"><use href="#i-plug"/></svg> Conectores</a>
+      <p class="nav-sec">Sitio</p>
+      <a class="side-link" href="/" target="_blank"><svg class="icon"><use href="#i-external"/></svg> Ver sitio público</a>
+    </nav>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <h1>Pedidos</h1>
+      <button class="btn btn-ghost btn-sm" onclick="load()">Actualizar</button>
+    </div>
+    <div class="toolbar">
+      <div class="search"><svg class="icon"><use href="#i-search"/></svg><input id="search" type="search" placeholder="Buscar por cliente o correo…" oninput="load()"></div>
+    </div>
+    <div id="list" class="table-wrap"><div class="empty">Cargando…</div></div>
+  </main>
+</div>
+
+<div class="modal-back" id="modal">
+  <div class="modal">
+    <h2 id="title">Detalle del pedido</h2>
+    <div id="detail"></div>
+    <div class="modal-foot"><button type="button" class="btn btn-ghost" onclick="closeModal()">Cerrar</button></div>
+  </div>
+</div>
+<div id="toasts" aria-live="polite"></div>
+
+<script>
+'use strict';
+const API = '/api/v1';
+let orders = [], products = [];
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+const statusCls = (s) => ({ pending: 'st-pending', confirmed: 'st-confirmed', cancelled: 'st-cancelled', completed: 'st-completed', paid: 'st-paid', unpaid: 'st-unpaid', refunded: 'st-refunded' }[s] || 'st-draft');
+const payCls = (s) => ({ paid: 'st-paid', unpaid: 'st-unpaid', refunded: 'st-refunded' }[s] || 'st-draft');
+const fmtUSD = (n, c) => `${c} ${Number(n).toLocaleString('es', { maximumFractionDigits: 2 })}`;
+const fmtDate = (s) => s ? new Date(s).toLocaleString('es', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) : '—';
+
+function toast(msg, type) { const el = document.createElement('div'); el.className = 'toast' + (type ? ' ' + type : ''); el.textContent = msg; document.getElementById('toasts').appendChild(el); setTimeout(() => el.remove(), 3500); }
+async function get(path) { const r = await fetch(API + path); if (!r.ok) { let d = {}; try { d = await r.json(); } catch (e) {} throw new Error(d.detail || 'Error ' + r.status); } return r.json(); }
+async function api(path, method, body) { const r = await fetch(API + path, { method, headers: { 'Content-Type': 'application/json' }, body: body ? JSON.stringify(body) : undefined }); if (!r.ok) { let d = {}; try { d = await r.json(); } catch (e) {} throw new Error(d.detail || 'Error ' + r.status); } return r.json().catch(() => ({})); }
+
+async function load() {
+  try {
+    orders = await get('/orders');
+    if (!products.length) products = await get('/products?status=active');
+    const prodName = (id) => (products.find((p) => p.id === id) || {}).name || (id || '').slice(0, 8);
+    const q = document.getElementById('search').value.trim().toLowerCase();
+    const list = q ? orders.filter((o) => (o.customer_name + ' ' + o.customer_email).toLowerCase().includes(q)) : orders;
+    document.getElementById('list').innerHTML = list.length
+      ? `<table><thead><tr><th>Cliente</th><th>Producto</th><th>Fecha</th><th>Cant.</th><th>Total</th><th>Estado</th><th>Pago</th><th></th></tr></thead><tbody>` +
+        list.map((o) => `<tr>
+          <td><div class="td-name">${esc(o.customer_name)}</div><div class="td-sub">${esc(o.customer_email)}</div></td>
+          <td><span class="td-sub">${esc(prodName(o.product_id))}</span></td>
+          <td>${fmtDate(o.date_from || o.created_at || '')}</td>
+          <td>${o.quantity}</td>
+          <td>${fmtUSD(o.total_amount, o.currency)}</td>
+          <td><span class="status ${statusCls(o.status)}">${o.status}</span></td>
+          <td><span class="status ${payCls(o.payment_status)}">${o.payment_status}</span></td>
+          <td><button class="btn btn-ghost btn-sm" onclick="openDetail('${o.id}')">Ver</button></td>
+        </tr>`).join('') + '</tbody></table>'
+      : '<div class="empty">Sin pedidos</div>';
+  } catch (e) { document.getElementById('list').innerHTML = `<div class="empty">${esc(e.message)}</div>`; }
+}
+
+async function openDetail(id) {
+  const o = orders.find((x) => x.id === id);
+  if (!o) return;
+  document.getElementById('title').textContent = 'Pedido ' + id.slice(0, 8);
+  document.getElementById('detail').innerHTML = `
+    <div class="grid" style="grid-template-columns:1fr 1fr;gap:.6rem 1rem;margin-bottom:1rem">
+      <div><div class="td-sub">Cliente</div><div class="td-name">${esc(o.customer_name)}</div></div>
+      <div><div class="td-sub">Correo</div><div>${esc(o.customer_email)}</div></div>
+      ${o.customer_phone ? `<div><div class="td-sub">Teléfono</div><div>${esc(o.customer_phone)}</div></div>` : ''}
+      ${o.date_from ? `<div><div class="td-sub">Fecha</div><div>${esc(o.date_from)}</div><div class="td-sub">${o.date_to ? '→ ' + esc(o.date_to) : ''}</div></div>` : ''}
+      <div><div class="td-sub">Cantidad</div><div>${o.quantity}</div></div>
+      <div><div class="td-sub">Total</div><div class="td-name">${fmtUSD(o.total_amount, o.currency)}</div></div>
+      <div><div class="td-sub">Estado</div><div><span class="status ${statusCls(o.status)}">${o.status}</span></div></div>
+      <div><div class="td-sub">Pago</div><div><span class="status ${payCls(o.payment_status)}">${o.payment_status}</span></div></div>
+    </div>
+    <div class="form-grid" style="grid-template-columns:1fr 1fr">
+      <div class="field"><label>Cambiar estado</label><select id="st-status">
+        <option value="pending" ${o.status === 'pending' ? 'selected' : ''}>Pendiente</option>
+        <option value="confirmed" ${o.status === 'confirmed' ? 'selected' : ''}>Confirmado</option>
+        <option value="completed" ${o.status === 'completed' ? 'selected' : ''}>Completado</option>
+        <option value="cancelled" ${o.status === 'cancelled' ? 'selected' : ''}>Cancelado</option>
+      </select></div>
+      <div class="field"><label>Cambiar pago</label><select id="st-pay">
+        <option value="unpaid" ${o.payment_status === 'unpaid' ? 'selected' : ''}>No pagado</option>
+        <option value="paid" ${o.payment_status === 'paid' ? 'selected' : ''}>Pagado</option>
+        <option value="refunded" ${o.payment_status === 'refunded' ? 'selected' : ''}>Reembolsado</option>
+      </select></div>
+    </div>
+    <div class="modal-foot" style="margin-top:1rem">
+      <button class="btn btn-ghost" onclick="closeModal()">Cerrar</button>
+      <button class="btn btn-primary" onclick="saveStatus('${o.id}')">Guardar cambios</button>
+    </div>`;
+  document.getElementById('modal').classList.add('open');
+}
+function closeModal() { document.getElementById('modal').classList.remove('open'); }
+document.getElementById('modal').addEventListener('click', (e) => { if (e.target.id === 'modal') closeModal(); });
+
+async function saveStatus(id) {
+  const status = document.getElementById('st-status').value;
+  const payment_status = document.getElementById('st-pay').value;
+  try {
+    await api('/orders/' + id, 'PATCH', { status, payment_status });
+    toast('Pedido actualizado');
+    closeModal(); load();
+  } catch (e) { toast(e.message, 'error'); }
+}
+load();
+</script>
+</body>
+</html>

@@ -1,1 +1,139 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><script src="https://cdn.tailwindcss.com"></script><link rel="stylesheet" href="styles.css"><title>Conectores</title></head><body class="p-6"><nav class="mb-8"><a href="index.html">← Dashboard</a></nav><main class="max-w-5xl"><h1 class="text-3xl mb-5">Conectores</h1><form id="form" class="glass p-4 rounded-xl flex gap-3"><input name="name" placeholder="Nombre" required><select name="platform"><option>native</option><option>shopify</option><option>woocommerce</option><option>prestashop</option></select><button>Agregar</button></form><div id="list" class="grid md:grid-cols-3 gap-4 mt-5"></div></main><script>const h={'Content-Type':'application/json','X-API-Key':localStorage.apiKey||''};async function load(){let a=await (await fetch('/api/v1/connectors',{headers:h})).json();list.innerHTML=a.map(x=>`<article class="glass p-4 rounded-xl"><b>${x.name}</b><p>${x.platform} · ${x.status}</p><button onclick="sync('${x.id}')">Sync</button></article>`).join('')}form.onsubmit=async e=>{e.preventDefault();let d=Object.fromEntries(new FormData(form));d.config={};let r=await fetch('/api/v1/connectors',{method:'POST',headers:h,body:JSON.stringify(d)});if(!r.ok)return alert((await r.json()).detail);load()};async function sync(id){alert(JSON.stringify(await (await fetch('/api/v1/connectors/'+id+'/sync',{method:'POST',headers:h})).json()))}load()</script></body></html>
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Conectores — Multi-Hub Admin</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ff385c'/%3E%3Cstop offset='1' stop-color='%23e31c5f'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='12' cy='12' r='3.4' fill='url(%23g)'/%3E%3Ccircle cx='4.5' cy='6.5' r='2.1' fill='url(%23g)'/%3E%3Ccircle cx='19.5' cy='6.5' r='2.1' fill='url(%23g)'/%3E%3Ccircle cx='4.5' cy='17.5' r='2.1' fill='url(%23g)'/%3E%3Ccircle cx='19.5' cy='17.5' r='2.1' fill='url(%23g)'/%3E%3Cpath d='M6.4 7.6 10.2 10.9M17.6 7.6 13.8 10.9M6.4 16.4 10.2 13.1M17.6 16.4 13.8 13.1M12 8.6v6.8' stroke='url(%23g)' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
+  <symbol id="i-logo" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.4" fill="currentColor"/><circle cx="4.5" cy="6.5" r="2.1" fill="currentColor"/><circle cx="19.5" cy="6.5" r="2.1" fill="currentColor"/><circle cx="4.5" cy="17.5" r="2.1" fill="currentColor"/><circle cx="19.5" cy="17.5" r="2.1" fill="currentColor"/><path d="M6.4 7.6 10.2 10.9M17.6 7.6 13.8 10.9M6.4 16.4 10.2 13.1M17.6 16.4 13.8 13.1M12 8.6v6.8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7h-6v7H4a1 1 0 0 1-1-1V10Z"/></symbol>
+  <symbol id="i-box" viewBox="0 0 24 24"><path d="M21 8 12 3 3 8v8l9 5 9-5V8Z"/><path d="M3 8l9 5 9-5M12 13v8"/></symbol>
+  <symbol id="i-order" viewBox="0 0 24 24"><path d="M6 3h12l2 4v14H4V7l2-4Z"/><path d="M4 7h16M9 11h6"/></symbol>
+  <symbol id="i-lead" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></symbol>
+  <symbol id="i-plug" viewBox="0 0 24 24"><path d="M12 3v5m0 0v5a3 3 0 0 0 3 3h0M12 8h5a2 2 0 0 1 2 2 5 5 0 0 1-5 5h-2M12 16v5"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-external" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4 10 14M18 13v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h6"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 7V3l-2 2a8 8 0 0 0-13 3m-1 9v4l2-2a8 8 0 0 0 13-3"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2m1 0v14a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V6m4 4v6m4-6v6"/></symbol>
+</svg>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="brand"><span class="brand-logo"><svg class="icon"><use href="#i-logo"/></svg></span><div>Multi-Hub<small>Panel de control</small></div></div>
+    <nav class="side-links" aria-label="Navegación del panel">
+      <p class="nav-sec">Operación</p>
+      <a class="side-link" href="index.html"><svg class="icon"><use href="#i-home"/></svg> Resumen</a>
+      <a class="side-link" href="products.html"><svg class="icon"><use href="#i-box"/></svg> Productos</a>
+      <a class="side-link" href="orders.html"><svg class="icon"><use href="#i-order"/></svg> Pedidos</a>
+      <a class="side-link" href="leads.html"><svg class="icon"><use href="#i-lead"/></svg> Contactos</a>
+      <a class="side-link active" href="connectors.html"><svg class="icon"><use href="#i-plug"/></svg> Conectores</a>
+      <p class="nav-sec">Sitio</p>
+      <a class="side-link" href="/" target="_blank"><svg class="icon"><use href="#i-external"/></svg> Ver sitio público</a>
+    </nav>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <h1>Conectores</h1>
+      <div class="topbar-actions"><button class="btn btn-primary" onclick="openModal()"><svg class="icon"><use href="#i-plus"/></svg> Nuevo conector</button></div>
+    </div>
+    <p class="muted" style="margin-bottom:1.2rem">Sincroniza tu catálogo con tiendas externas (Shopify, WooCommerce, PrestaShop).</p>
+    <div id="list" class="grid grid-2"><div class="card"><div class="empty">Cargando…</div></div></div>
+  </main>
+</div>
+
+<div class="modal-back" id="modal">
+  <div class="modal">
+    <h2>Nuevo conector</h2>
+    <form id="cform" novalidate>
+      <div class="form-grid">
+        <div class="field"><label for="c-name">Nombre *</label><input id="c-name" name="name"><div class="err" id="c-e-name"></div></div>
+        <div class="field"><label for="c-platform">Plataforma *</label>
+          <select id="c-platform" name="platform"><option value="native">Nativo (Multi-Hub)</option><option value="shopify">Shopify</option><option value="woocommerce">WooCommerce</option><option value="prestashop">PrestaShop</option></select>
+        </div>
+        <div class="field"><label for="c-interval">Intervalo de sync (min)</label><input id="c-interval" name="sync_interval_minutes" type="number" min="1" value="60"></div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Crear conector</button>
+      </div>
+    </form>
+  </div>
+</div>
+<div id="toasts" aria-live="polite"></div>
+
+<script>
+'use strict';
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+const PLATFORM_ICO = { native: '🛠', shopify: '🛍', woocommerce: '🛒', prestashop: '🏷' };
+const statusCls = (s) => ({ active: 'st-active', disabled: 'st-disabled', error: 'st-error' }[s] || 'st-draft');
+const fmtDate = (s) => s ? new Date(s).toLocaleString('es', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) : 'Nunca';
+function toast(msg, type) { const el = document.createElement('div'); el.className = 'toast' + (type ? ' ' + type : ''); el.textContent = msg; document.getElementById('toasts').appendChild(el); setTimeout(() => el.remove(), 3500); }
+async function get(path, opts) { const r = await fetch('/api/v1' + path, opts); if (!r.ok) { let d = {}; try { d = await r.json(); } catch (e) {} throw new Error(d.detail || 'Error ' + r.status); } return r.json(); }
+async function api(path, method, body) { const r = await fetch('/api/v1' + path, { method, headers: { 'Content-Type': 'application/json' }, body: body ? JSON.stringify(body) : undefined }); if (!r.ok) { let d = {}; try { d = await r.json(); } catch (e) {} throw new Error(d.detail || 'Error ' + r.status); } return r.json().catch(() => ({})); }
+
+async function load() {
+  try {
+    const conns = await get('/connectors');
+    document.getElementById('list').innerHTML = conns.length
+      ? conns.map((c) => `<div class="card">
+          <div class="flex-between">
+            <div class="flex"><span style="font-size:1.4rem">${PLATFORM_ICO[c.platform] || '🔌'}</span><div><div class="td-name">${esc(c.name)}</div><div class="td-sub">${esc(c.platform)} · cada ${c.sync_interval_minutes} min</div></div></div>
+            <span class="status ${statusCls(c.status)}">${c.status}</span>
+          </div>
+          <div class="td-sub" style="margin:.8rem 0">Última sync: ${fmtDate(c.last_sync_at)}</div>
+          <div class="flex">
+            <button class="btn btn-ghost btn-sm" onclick="sync('${c.id}','${esc(c.name)}')">Sincronizar</button>
+            <button class="btn btn-ghost btn-sm" onclick="check('${c.id}')">Verificar</button>
+            ${c.status !== 'disabled' ? `<button class="btn btn-danger btn-sm" onclick="disable('${c.id}','${esc(c.name)}')">Desactivar</button>` : ''}
+          </div>
+        </div>`).join('')
+      : '<div class="card"><div class="empty"><svg class="icon"><use href="#i-plug"/></svg>No hay conectores configurados</div></div>';
+  } catch (e) { document.getElementById('list').innerHTML = `<div class="card"><div class="empty">${esc(e.message)}</div></div>`; }
+}
+
+async function sync(id, name) {
+  try {
+    const r = await api('/connectors/' + id + '/sync', 'POST');
+    toast(`Sync iniciado para "${name}"` + (r.task_id ? ` (tarea ${r.task_id.slice(0, 8)})` : ' — el worker no está disponible, pendiente en cola'));
+  } catch (e) { toast(e.message, 'error'); }
+}
+async function check(id) {
+  try {
+    const r = await get('/connectors/' + id + '/status', { method: 'POST' });
+    toast(`Estado: ${r.status}. ${r.health && r.health.ok ? 'Conexión OK' : (r.health && r.health.detail ? String(r.health.detail).slice(0, 80) : 'Verificado')}`, r.status === 'active' ? 'ok' : 'warn');
+    load();
+  } catch (e) { toast(e.message, 'error'); }
+}
+async function disable(id, name) {
+  if (!confirm(`¿Desactivar el conector "${name}"?`)) return;
+  try { await api('/connectors/' + id, 'DELETE'); toast('Conector desactivado'); load(); } catch (e) { toast(e.message, 'error'); }
+}
+
+function openModal() { document.getElementById('cform').reset(); document.getElementById('c-e-name').textContent = ''; document.getElementById('modal').classList.add('open'); }
+function closeModal() { document.getElementById('modal').classList.remove('open'); }
+document.getElementById('modal').addEventListener('click', (e) => { if (e.target.id === 'modal') closeModal(); });
+document.getElementById('cform').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const name = document.getElementById('c-name').value.trim();
+  const platform = document.getElementById('c-platform').value;
+  const sync_interval_minutes = Math.max(1, parseInt(document.getElementById('c-interval').value, 10) || 60);
+  if (!name || name.length < 2) { document.getElementById('c-e-name').textContent = 'El nombre es obligatorio (mínimo 2 caracteres)'; return; }
+  document.getElementById('c-e-name').textContent = '';
+  try {
+    await api('/connectors', 'POST', { name, platform, config: {}, sync_interval_minutes });
+    toast('Conector creado'); closeModal(); load();
+  } catch (err) { toast(err.message, 'error'); }
+});
+load();
+</script>
+</body>
+</html>
