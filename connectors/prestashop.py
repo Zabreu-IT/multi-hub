@@ -56,6 +56,8 @@ class PrestashopConnector(BaseConnector):
     <id_customer>1</id_customer>
     <id_address_delivery>1</id_address_delivery>
     <id_address_invoice>1</id_address_invoice>
+    <id_currency>1</id_currency>
+    <id_lang>1</id_lang>
     <payment>bankwire</payment>
     <module>bankwire</module>
     <id_cart>{cart_id}</id_cart>
