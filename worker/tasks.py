@@ -43,7 +43,7 @@ def sync_connector(connector_id: str):
 @celery.task
 def reconcile_connectors():
     db = SessionLocal()
-    try: return [sync_connector.delay(str(x)).id for x in db.scalars(select(Connector).where(Connector.status == "active")).all()]
+    try: return [sync_connector.delay(str(x.id)).id for x in db.scalars(select(Connector).where(Connector.status == "active")).all()]
     finally: db.close()
 
 
