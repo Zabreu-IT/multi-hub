@@ -30,6 +30,7 @@ class PrestashopConnector(BaseConnector):
       <cart_rows>
         <cart_row>
           <id_product>{int(order_data.product_id)}</id_product>
+          <id_product_attribute>0</id_product_attribute>
           <quantity>{order_data.quantity}</quantity>
         </cart_row>
       </cart_rows>
