@@ -15,24 +15,28 @@ const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => (
 
 /* ---------- Tipos de producto ---------- */
 const TYPES = {
-  hotel:      { label: 'Hotel',       emoji: '🏨', grad: 'linear-gradient(135deg,#1e1b4b,#4c1d95)' },
-  tour:       { label: 'Tour',        emoji: '🧭', grad: 'linear-gradient(135deg,#164e63,#0e7490)' },
-  restaurant: { label: 'Restaurante', emoji: '🍽️', grad: 'linear-gradient(135deg,#451a03,#b45309)' },
-  event:      { label: 'Evento',      emoji: '🎭', grad: 'linear-gradient(135deg,#2e1065,#7c3aed)' },
-  service:    { label: 'Servicio',    emoji: '✨', grad: 'linear-gradient(135deg,#0f172a,#4338ca)' },
-  custom:     { label: 'Experiencia', emoji: '🌟', grad: 'linear-gradient(135deg,#172554,#7c3aed)' },
+  hotel:      { label: 'Hotel',       emoji: '🏨', icon: 'i-cat-hotel',      grad: 'linear-gradient(135deg,#1e1b4b,#4c1d95)' },
+  tour:       { label: 'Tour',        emoji: '🧭', icon: 'i-cat-tour',       grad: 'linear-gradient(135deg,#164e63,#0e7490)' },
+  restaurant: { label: 'Restaurante', emoji: '🍽️', icon: 'i-cat-restaurant', grad: 'linear-gradient(135deg,#451a03,#b45309)' },
+  event:      { label: 'Evento',      emoji: '🎭', icon: 'i-cat-event',      grad: 'linear-gradient(135deg,#2e1065,#7c3aed)' },
+  service:    { label: 'Servicio',    emoji: '✨', icon: 'i-cat-service',    grad: 'linear-gradient(135deg,#0f172a,#4338ca)' },
+  custom:     { label: 'Experiencia', emoji: '🌟', icon: 'i-cat-service',    grad: 'linear-gradient(135deg,#172554,#7c3aed)' },
 };
 const typeInfo = (t) => TYPES[t] || TYPES.custom;
 
 /* ---------- Iconos de categoría por slug/nombre ---------- */
-const CAT_EMOJI = {
-  hotel: '🏨', hoteles: '🏨', hospedaje: '🏨',
-  restaurante: '🍽️', restaurantes: '🍽️', gastronomia: '🍽️', gastronomía: '🍽️',
-  tour: '🧭', tours: '🧭', 'tours-y-aventura': '🧭', aventura: '🧭',
-  spa: '💆', 'spa-y-bienestar': '💆', bienestar: '💆',
-  evento: '🎭', eventos: '🎭',
+const CAT_ICON = {
+  hotel: 'i-cat-hotel', hoteles: 'i-cat-hotel', hospedaje: 'i-cat-hotel',
+  restaurante: 'i-cat-restaurant', restaurantes: 'i-cat-restaurant', gastronomia: 'i-cat-restaurant', gastronomía: 'i-cat-restaurant',
+  tour: 'i-cat-tour', tours: 'i-cat-tour', 'tours-y-aventura': 'i-cat-tour', 'tours-aventura': 'i-cat-tour', aventura: 'i-cat-tour',
+  spa: 'i-cat-spa', 'spa-y-bienestar': 'i-cat-spa', 'spa-bienestar': 'i-cat-spa', bienestar: 'i-cat-spa',
+  transporte: 'i-cat-transport', transport: 'i-cat-transport',
+  evento: 'i-cat-event', eventos: 'i-cat-event',
 };
-const catEmoji = (c) => CAT_EMOJI[String((c && (c.slug || c.name)) || '').toLowerCase()] || '✨';
+const catIcon = (c) => {
+  const id = CAT_ICON[String((c && (c.slug || c.name)) || '').toLowerCase()] || 'i-cat-service';
+  return `<svg class="ic" aria-hidden="true"><use href="#${id}"/></svg>`;
+};
 
 /* ---------- Moneda ---------- */
 const money = (n, currency) => {
@@ -85,7 +89,7 @@ window.imgFail = function (el) {
 const card = (p, opts = {}) => {
   const t = typeInfo(p.product_type);
   const venue = p.metadata && p.metadata.venue;
-  const typeBadge = `<span class="badge card-type">${t.emoji} ${t.label}</span>`;
+  const typeBadge = `<span class="badge card-type"><svg class="ic" aria-hidden="true"><use href="#${t.icon}"/></svg> ${t.label}</span>`;
   return `
   <a class="card reveal ${opts.cls || ''}" href="product.html?id=${esc(p.id)}" aria-label="Ver ${esc(p.name)}">
     <div class="card-media">

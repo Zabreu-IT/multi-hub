@@ -328,3 +328,71 @@ button { font-family: inherit; }
   .reveal { opacity: 1; transform: none; }
   .hero-glow { animation: none; }
 }
+
+/* ============================================================
+   Animaciones y transiciones premium
+   ============================================================ */
+
+/* ---------- Botones: press + shine sweep ---------- */
+.btn { position: relative; overflow: hidden; }
+.btn:active { transform: scale(.97); }
+.btn-primary::after {
+  content: ""; position: absolute; top: 0; left: -80%; width: 50%; height: 100%;
+  background: linear-gradient(100deg, transparent, rgba(255,255,255,.35), transparent);
+  transform: skewX(-20deg); transition: left .55s var(--ease);
+}
+.btn-primary:hover::after { left: 130%; }
+
+/* ---------- Cards: lift + sombra + zoom suave ---------- */
+.card { transition: transform .35s var(--ease), box-shadow .35s var(--ease), border-color .35s var(--ease); }
+.card:hover { transform: translateY(-6px); box-shadow: 0 10px 30px rgba(0,0,0,.08), 0 24px 60px rgba(0,0,0,.1); }
+.card-media .ph-img { transition: transform .8s var(--ease); }
+.card:hover .card-media .ph-img { transform: scale(1.07); }
+.card-name { transition: color .25s; }
+.card:hover .card-name { color: var(--coral); }
+
+/* ---------- Reveal stagger mejorado ---------- */
+.reveal { opacity: 0; transform: translateY(22px); transition: opacity .7s var(--ease), transform .7s var(--ease); }
+.reveal.in { opacity: 1; transform: none; }
+
+/* ---------- Hero: entrada escalonada ---------- */
+.hero-eyebrow { animation: heroUp .7s var(--ease) both; }
+.hero h1 { animation: heroUp .8s .12s var(--ease) both; }
+.hero-sub { animation: heroUp .8s .24s var(--ease) both; }
+.search-wrap { animation: heroUp .8s .36s var(--ease) both; }
+.hero-quick { animation: heroUp .8s .48s var(--ease) both; }
+@keyframes heroUp { from { opacity: 0; transform: translateY(26px); } to { opacity: 1; transform: none; } }
+
+/* ---------- Categorías: icono animado en hover ---------- */
+.cat-card { transition: transform .3s var(--ease), box-shadow .3s var(--ease), border-color .3s var(--ease); }
+.cat-card:hover { transform: translateY(-4px); }
+.cat-ico { transition: transform .35s var(--ease), background .3s, border-color .3s; }
+.cat-card:hover .cat-ico { transform: scale(1.12) rotate(-6deg); background: var(--grad-soft); border-color: rgba(255,56,92,.35); }
+.cat-ico .ic { width: 24px; height: 24px; color: var(--coral); transition: transform .35s var(--ease); }
+.cat-card:hover .cat-ico .ic { transform: scale(1.1); }
+
+/* ---------- Steps: icono animado ---------- */
+.step-ico { transition: transform .35s var(--ease), background .3s; }
+.step:hover .step-ico { transform: scale(1.1) rotate(-4deg); background: var(--grad-soft); }
+
+/* ---------- WhatsApp float: pulse sutil ---------- */
+.wa-float { animation: waPulse 2.6s ease-in-out infinite; }
+@keyframes waPulse {
+  0%, 100% { box-shadow: 0 6px 20px rgba(37,211,102,.4); }
+  50% { box-shadow: 0 6px 20px rgba(37,211,102,.4), 0 0 0 10px rgba(37,211,102,.12); }
+}
+
+/* ---------- Navbar: transición suave scroll ---------- */
+.nav { transition: box-shadow .3s var(--ease), background .3s var(--ease); }
+
+/* ---------- Chips: micro-interacción ---------- */
+.chip { transition: all .25s var(--ease); }
+.chip:active { transform: scale(.95); }
+
+/* ---------- Badge en card: entrada sutil ---------- */
+.card-type { transition: transform .3s var(--ease); }
+.card:hover .card-type { transform: translateY(2px); }
+
+/* ---------- Imagen galería: zoom lento ---------- */
+.product-gallery .gallery-img { transition: transform 1.2s var(--ease); }
+.product-gallery:hover .gallery-img { transform: scale(1.04); }
