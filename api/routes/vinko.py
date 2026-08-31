@@ -223,7 +223,7 @@ def update_space(id: UUID, data: SpaceIn, authorization: str | None = Header(def
     if not s:
         raise HTTPException(404, "Space not found")
     u = db.get(User, UUID(uid))
-    if not u or (s.owner_id != u.id and u.role not in ("owner", "admin")):
+    if not u or (s.owner_id != u.id and u.role not in ("SPACE_OWNER", "ADMIN")):
         raise HTTPException(403, "No tienes permiso")
     for k, v in data.model_dump().items():
         setattr(s, k, v)
@@ -256,7 +256,7 @@ def add_space_availability(id: UUID, data: SpaceAvailIn, authorization: str | No
         raise HTTPException(404, "Space not found")
     uid = get_current_user_id(authorization)
     u = db.get(User, UUID(uid))
-    if not u or (s.owner_id != u.id and u.role not in ("owner", "admin")):
+    if not u or (s.owner_id != u.id and u.role not in ("SPACE_OWNER", "ADMIN")):
         raise HTTPException(403, "No tienes permiso")
     try:
         st = time.fromisoformat(data.start_time)
@@ -414,3 +414,105 @@ def list_evidence(experience_id: UUID | None = None, db: Session = Depends(get_d
          "is_verified": e.is_verified, "created_at": e.created_at.isoformat()}
         for e in db.scalars(q.order_by(EventEvidence.created_at.desc())).all()
     ]
+
+
+# ============ EXPERIENCES (CRUD organizer) ============
+class ExperienceIn(BaseModel):
+    name: str = Field(min_length=1, max_length=250)
+    slug: str = Field(pattern=r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
+    description: str | None = None
+    description_short: str | None = None
+    category_id: UUID | None = None
+    base_price: Decimal = Field(default=0, ge=0)
+    currency: str = "USD"
+    images: list[str] = []
+    location_type: str = "private_space"
+    location_lat: Decimal | None = None
+    location_lng: Decimal | None = None
+    location_description: str | None = None
+    metadata: dict = {}
+
+
+def experience_out(p: Product) -> dict:
+    return {
+        "id": str(p.id), "name": p.name, "slug": p.slug, "description": p.description,
+        "description_short": p.description_short, "category_id": str(p.category_id) if p.category_id else None,
+        "base_price": float(p.base_price), "currency": p.currency, "status": p.status,
+        "images": p.images, "organizer_id": str(p.organizer_id) if p.organizer_id else None,
+        "location_type": p.location_type, "location_lat": float(p.location_lat) if p.location_lat else None,
+        "location_lng": float(p.location_lng) if p.location_lng else None,
+        "location_description": p.location_description, "metadata": p.metadata_,
+    }
+
+
+@router.get("/experiences/mine")
+def my_experiences(authorization: str | None = Header(default=None), db: Session = Depends(get_db)):
+    uid = get_current_user_id(authorization)
+    u = db.get(User, UUID(uid))
+    if not u:
+        raise HTTPException(404, "User not found")
+    if u.role not in ("ORGANIZER", "ADMIN"):
+        raise HTTPException(403, "Solo organizadores")
+    q = select(Product).where(Product.organizer_id == u.id, Product.product_type == "experience", Product.status != "archived")
+    return [experience_out(p) for p in db.scalars(q.order_by(Product.created_at.desc())).all()]
+
+
+@router.post("/experiences")
+def create_experience(data: ExperienceIn, authorization: str | None = Header(default=None), db: Session = Depends(get_db)):
+    uid = get_current_user_id(authorization)
+    u = db.get(User, UUID(uid))
+    if not u:
+        raise HTTPException(404, "User not found")
+    if u.role not in ("ORGANIZER", "ADMIN"):
+        raise HTTPException(403, "Solo organizadores pueden crear experiencias")
+    p = Product(
+        name=data.name, slug=data.slug, description=data.description,
+        description_short=data.description_short, category_id=data.category_id,
+        base_price=data.base_price, currency=data.currency, product_type="experience",
+        status="active", images=data.images, organizer_id=u.id,
+        location_type=data.location_type, location_lat=data.location_lat,
+        location_lng=data.location_lng, location_description=data.location_description,
+        metadata_=data.metadata,
+    )
+    db.add(p)
+    try:
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise HTTPException(409, "Slug ya existe")
+    db.refresh(p)
+    return experience_out(p)
+
+
+@router.put("/experiences/{id}")
+def update_experience(id: UUID, data: ExperienceIn, authorization: str | None = Header(default=None), db: Session = Depends(get_db)):
+    uid = get_current_user_id(authorization)
+    p = db.get(Product, id)
+    if not p:
+        raise HTTPException(404, "Experience not found")
+    u = db.get(User, UUID(uid))
+    if not u or (p.organizer_id != u.id and u.role not in ("ADMIN", "owner", "admin")):
+        raise HTTPException(403, "No tienes permiso")
+    for k, v in data.model_dump(exclude={"metadata"}).items():
+        setattr(p, k, v)
+    p.metadata_ = data.metadata
+    try:
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise HTTPException(409, "Slug ya existe")
+    return experience_out(p)
+
+
+@router.delete("/experiences/{id}")
+def archive_experience(id: UUID, authorization: str | None = Header(default=None), db: Session = Depends(get_db)):
+    uid = get_current_user_id(authorization)
+    p = db.get(Product, id)
+    if not p:
+        raise HTTPException(404, "Experience not found")
+    u = db.get(User, UUID(uid))
+    if not u or (p.organizer_id != u.id and u.role not in ("ADMIN", "owner", "admin")):
+        raise HTTPException(403, "No tienes permiso")
+    p.status = "archived"
+    db.commit()
+    return {"ok": True}
