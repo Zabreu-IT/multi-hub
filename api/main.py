@@ -1,12 +1,13 @@
 from contextlib import asynccontextmanager
 from pathlib import Path
 from fastapi import FastAPI
+from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy import text
 from core.database import engine
 from core.models import Base
 from api.middleware import request_context
-from api.routes import products,categories,availability,connectors,orders,dashboard,media,leads,auth,vinko
+from api.routes import products,categories,availability,connectors,orders,dashboard,media,leads,auth,vinko,payments
 @asynccontextmanager
 async def lifespan(app):
  Base.metadata.create_all(engine)
@@ -16,9 +17,14 @@ async def lifespan(app):
  yield
 app=FastAPI(title="Multi-Hub API",version="1.0.0",lifespan=lifespan)
 app.middleware("http")(request_context)
-for route in (products,categories,availability,connectors,orders,dashboard,media,leads,auth,vinko): app.include_router(route.router,prefix="/api/v1")
+for route in (products,categories,availability,connectors,orders,dashboard,media,leads,auth,vinko,payments): app.include_router(route.router,prefix="/api/v1")
 @app.get("/health")
 def health(): return {"ok":True}
 app.mount("/dashboard",StaticFiles(directory=Path("/app/dashboard"),html=True),name="dashboard")
 app.mount("/apps/frontend",StaticFiles(directory=Path("/app/apps/frontend"),html=True),name="how-it-works")
+@app.get("/u/{slug}")
+def bio_page(slug: str):
+    """Link-in-bio público: sirve u.html para /u/{slug}."""
+    return FileResponse(Path("/app/frontend/u.html"))
+
 app.mount("/",StaticFiles(directory=Path("/app/frontend"),html=True),name="frontend")

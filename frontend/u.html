@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VINKO — Perfil</title>
+<meta name="robots" content="index, follow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  body { background: var(--bg); }
+  .bio-wrap { max-width: 560px; margin: 0 auto; padding: 2.5rem 1.5rem; }
+  .bio-head { text-align: center; margin-bottom: 2rem; }
+  .bio-avatar { width: 88px; height: 88px; border-radius: 50%; background: var(--grad); display: grid; place-items: center; color: #fff; font-family: var(--font-display); font-weight: 800; font-size: 2rem; margin: 0 auto 1rem; }
+  .bio-head h1 { font-family: var(--font-display); font-size: 1.5rem; font-weight: 800; }
+  .bio-head .bio-bio { color: var(--text-2); font-size: .9rem; margin-top: .4rem; }
+  .bio-badges { display: flex; justify-content: center; gap: .5rem; margin-top: .8rem; flex-wrap: wrap; }
+  .bio-badge { background: var(--accent-soft); color: var(--accent); padding: .25rem .7rem; border-radius: 999px; font-size: .72rem; font-weight: 700; }
+  .bio-list { display: grid; gap: 1rem; }
+  .bio-item { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden; }
+  .bio-item img { width: 100%; height: 180px; object-fit: cover; display: block; }
+  .bio-item .body { padding: 1rem 1.2rem; }
+  .bio-item h3 { font-family: var(--font-display); font-size: 1rem; font-weight: 700; }
+  .bio-item .price { color: var(--accent); font-weight: 700; font-size: .95rem; margin-top: .3rem; }
+  .bio-item .loc { color: var(--text-3); font-size: .78rem; margin-top: .2rem; }
+  .bio-item a { text-decoration: none; color: inherit; }
+  .bio-empty { text-align: center; color: var(--text-3); padding: 3rem 0; }
+  .bio-err { text-align: center; color: var(--red); padding: 3rem 0; }
+</style>
+</head>
+<body>
+<main class="bio-wrap" id="app">
+  <div class="bio-err">Cargando perfil…</div>
+</main>
+<script>
+'use strict';
+const slug = location.pathname.split('/').filter(Boolean).pop();
+const app = document.getElementById('app');
+function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function money(n) { return '$' + Number(n || 0).toLocaleString('es-AR', { minimumFractionDigits: 2 }); }
+(async function () {
+  try {
+    const r = await fetch('/api/v1/profiles/' + encodeURIComponent(slug));
+    if (!r.ok) throw new Error('Perfil no encontrado');
+    const d = await r.json();
+    const bio = (d.bio && d.bio.es) || '';
+    const initial = (d.user.name || '?').charAt(0).toUpperCase();
+    const items = d.experiences.length ? d.experiences.map(x => `
+      <div class="bio-item">
+        <a href="/product.html?id=${x.id}">
+          ${x.images && x.images[0] ? '<img src="' + esc(x.images[0]) + '" alt="' + esc(x.name) + '" loading="lazy">' : ''}
+          <div class="body">
+            <h3>${esc(x.name)}</h3>
+            <div class="price">${money(x.base_price)} ${esc(x.currency || 'USD')}</div>
+            <div class="loc">${x.location_type === 'public_space' ? 'Espacio público' : 'Espacio privado'}</div>
+          </div>
+        </a>
+      </div>`).join('') : '<div class="bio-empty">Este organizador aún no publica experiencias.</div>';
+    document.title = d.user.name + ' — VINKO';
+    app.innerHTML = `
+      <div class="bio-head">
+        <div class="bio-avatar">${esc(initial)}</div>
+        <h1>${esc(d.user.name)}</h1>
+        ${bio ? '<p class="bio-bio">' + esc(bio) + '</p>' : ''}
+        <div class="bio-badges">
+          <span class="bio-badge">${esc(d.user.role.replace('_', ' '))}</span>
+          <span class="bio-badge">Tier ${esc(d.user.tier_id || 1)}</span>
+          <span class="bio-badge">★ ${Number(d.rating_average || 0).toFixed(1)}</span>
+        </div>
+      </div>
+      <div class="bio-list">${items}</div>`;
+  } catch (e) {
+    app.innerHTML = '<div class="bio-err">Perfil no encontrado.</div>';
+  }
+})();
+</script>
+</body>
+</html>
