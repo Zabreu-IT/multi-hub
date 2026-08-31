@@ -171,3 +171,23 @@ def login(data: LoginRequest, db: Session = Depends(get_db)):
     db.commit()
     token = create_jwt(str(user.id), user.role)
     return {"token": token, "user": {"id": str(user.id), "username": user.username, "role": user.role}}
+
+
+class VinkoLoginRequest(BaseModel):
+    email: str
+    password: str
+
+
+@router.post("/vinko-login")
+def vinko_login(data: VinkoLoginRequest, db: Session = Depends(get_db)):
+    """Login de usuarios de plataforma (users, no admin_users). Devuelve JWT con role."""
+    import bcrypt
+    u = db.scalar(select(User).where(User.email == data.email))
+    if not u or not u.is_active:
+        raise HTTPException(401, "Credenciales inválidas")
+    if not u.password_hash or not bcrypt.checkpw(data.password.encode(), u.password_hash.encode()):
+        raise HTTPException(401, "Credenciales inválidas")
+    u.last_login = datetime.now(timezone.utc)
+    db.commit()
+    token = create_jwt(str(u.id), u.role)
+    return {"token": token, "user": {"id": str(u.id), "name": u.name, "email": u.email, "role": u.role, "tier_id": u.tier_id, "slug": u.slug}}

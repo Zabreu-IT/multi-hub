@@ -129,6 +129,7 @@ class User(Base):
     email: Mapped[str] = mapped_column(Text, unique=True)
     name: Mapped[str] = mapped_column(Text)
     avatar_url: Mapped[str | None] = mapped_column(Text)
+    password_hash: Mapped[str | None] = mapped_column(Text)
     is_active: Mapped[bool] = mapped_column(default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     last_login: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))

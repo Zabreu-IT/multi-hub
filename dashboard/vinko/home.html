@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VINKO — Panel</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  body { background: var(--bg); }
+  .vinko-nav { display: flex; align-items: center; justify-content: space-between; padding: 1rem 2rem; background: var(--surface); border-bottom: 1px solid var(--border); }
+  .vinko-brand { font-family: var(--font-display); font-weight: 800; font-size: 1.2rem; color: var(--accent); }
+  .vinko-user { display: flex; align-items: center; gap: .8rem; font-size: .85rem; color: var(--text-2); }
+  .vinko-user .role-badge { background: var(--accent-soft); color: var(--accent); padding: .2rem .6rem; border-radius: 999px; font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; }
+  .vinko-main { max-width: 1100px; margin: 2rem auto; padding: 0 1.5rem; }
+  .vinko-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+  .vinko-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 1.4rem; }
+  .vinko-card .num { font-family: var(--font-display); font-size: 1.8rem; font-weight: 800; color: var(--text-1); }
+  .vinko-card .lbl { font-size: .8rem; color: var(--text-3); margin-top: .2rem; }
+  .vinko-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1rem; }
+  .vinko-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 1.4rem; }
+  .vinko-panel h3 { font-family: var(--font-display); font-size: 1rem; font-weight: 700; margin-bottom: 1rem; }
+  .vinko-panel ul { list-style: none; }
+  .vinko-panel li { display: flex; justify-content: space-between; padding: .6rem 0; border-bottom: 1px solid var(--border-2); font-size: .85rem; }
+  .vinko-panel li:last-child { border-bottom: none; }
+  .vinko-panel .muted { color: var(--text-3); }
+  .btn-logout { background: none; border: 1px solid var(--border); color: var(--text-2); padding: .4rem .9rem; border-radius: 10px; cursor: pointer; font-size: .8rem; }
+  .btn-logout:hover { border-color: var(--red); color: var(--red); }
+</style>
+</head>
+<body>
+<nav class="vinko-nav">
+  <div class="vinko-brand">VINKO</div>
+  <div class="vinko-user">
+    <span id="user-name">—</span>
+    <span class="role-badge" id="user-role">—</span>
+    <button class="btn-logout" onclick="logout()">Salir</button>
+  </div>
+</nav>
+<main class="vinko-main">
+  <div class="vinko-cards" id="stats"></div>
+  <div class="vinko-grid" id="panels"></div>
+</main>
+<script>
+'use strict';
+const TOKEN_KEY = 'vinko_token', USER_KEY = 'vinko_user';
+function getToken() { return localStorage.getItem(TOKEN_KEY) || ''; }
+function getUser() { try { return JSON.parse(localStorage.getItem(USER_KEY) || 'null'); } catch (e) { return null; } }
+function logout() { localStorage.removeItem(TOKEN_KEY); localStorage.removeItem(USER_KEY); location.href = 'login.html'; }
+function hdr() { return { 'Authorization': 'Bearer ' + getToken() }; }
+async function api(path) {
+  const r = await fetch('/api/v1' + path, { headers: hdr() });
+  if (r.status === 401) { logout(); throw new Error('Sesión expirada'); }
+  return r.json();
+}
+function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function money(n) { return '$' + Number(n || 0).toLocaleString('es-AR', { minimumFractionDigits: 2 }); }
+
+(async function () {
+  const u = getUser();
+  if (!u) { location.href = 'login.html'; return; }
+  document.getElementById('user-name').textContent = u.name;
+  document.getElementById('user-role').textContent = u.role.replace('_', ' ');
+  const me = await api('/users/me');
+  const stats = document.getElementById('stats');
+  const panels = document.getElementById('panels');
+
+  if (u.role === 'ORGANIZER') {
+    const tier = await api('/tiers/' + (me.tier_id || 1));
+    const exp = await api('/products?type=experience&status=active');
+    const mine = exp.filter(p => p.organizer_id === me.id);
+    const coupons = await api('/coupons');
+    stats.innerHTML = [
+      card(money(me.gmv_total), 'GMV total'),
+      card(tier.name, 'Tier · ' + tier.commission_rate + '% comisión'),
+      card(mine.length, 'Experiencias activas'),
+      card(coupons.length, 'Cupones')
+    ].join('');
+    panels.innerHTML = [
+      panel('Mis experiencias', mine.length ? mine.map(p => '<li><span>' + esc(p.name) + '</span><span class="muted">' + money(p.base_price) + '</span></li>').join('') : '<li class="muted">Sin experiencias aún</li>'),
+      panel('Mis cupones', coupons.length ? coupons.map(c => '<li><span>' + esc(c.code) + '</span><span class="muted">' + c.discount_percent + '%</span></li>').join('') : '<li class="muted">Sin cupones</li>')
+    ].join('');
+  } else if (u.role === 'SPACE_OWNER') {
+    const spaces = await api('/spaces');
+    const mine = spaces.filter(s => s.owner_id === me.id);
+    stats.innerHTML = [
+      card(mine.length, 'Espacios activos'),
+      card(mine.reduce((a, s) => a + (s.capacity || 0), 0), 'Capacidad total'),
+      card(mine.filter(s => s.is_active).length, 'Publicados')
+    ].join('');
+    panels.innerHTML = [
+      panel('Mis espacios', mine.length ? mine.map(s => '<li><span>' + esc(s.name) + '</span><span class="muted">' + money(s.price_per_hour) + '/h</span></li>').join('') : '<li class="muted">Sin espacios aún</li>')
+    ].join('');
+  } else {
+    stats.innerHTML = [card('—', 'Rol cliente'), card('—', 'Explora experiencias')].join('');
+    panels.innerHTML = panel('Bienvenido', '<li class="muted">Explora el catálogo de experiencias en hub.zabreuit.com</li>');
+  }
+})();
+function card(num, lbl) { return '<div class="vinko-card"><div class="num">' + num + '</div><div class="lbl">' + lbl + '</div></div>'; }
+function panel(title, body) { return '<div class="vinko-panel"><h3>' + title + '</h3><ul>' + body + '</ul></div>'; }
+</script>
+</body>
+</html>
